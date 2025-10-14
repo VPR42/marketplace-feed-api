@@ -1,1 +1,1 @@
-rootProject.name = "java-backend-template"
+rootProject.name = "marketplace-feed-api"

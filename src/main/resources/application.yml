@@ -3,7 +3,7 @@ logging:
 
 spring:
   application:
-    name: java-backend-template
+    name: marketplace-feed-api
 
 server:
-  port: 33300
+  port: 33303

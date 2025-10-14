@@ -1,12 +1,12 @@
-package com.vpr42.javabackendtemplate;
+package com.vpr42.marketplacefeedapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JavaBackendTemplateApplication {
+public class MarketplaceFeedApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(JavaBackendTemplateApplication.class, args);
+        SpringApplication.run(MarketplaceFeedApiApplication.class, args);
     }
 }

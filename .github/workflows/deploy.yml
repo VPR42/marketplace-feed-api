@@ -5,9 +5,9 @@ on:
 
 env:
   JAVA_VERSION: '21'
-  TARGET_DIR: /home/kinoko/marketplace/module-name
-  BACKUP_DIR: /home/kinoko/backup/module-name
-  JAR_DIR: /tmp/marketplace/module-name
+  TARGET_DIR: /home/kinoko/marketplace/feed-api
+  BACKUP_DIR: /home/kinoko/backup/feed-api
+  JAR_DIR: /tmp/marketplace/feed-api
 
 jobs:
   build:
