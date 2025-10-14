@@ -1,0 +1,9 @@
+logging:
+  config: 'classpath:log4j2.yml'
+
+spring:
+  application:
+    name: java-backend-template
+
+server:
+  port: 33300
