@@ -1,5 +1,5 @@
 services:
-  bank-api:
+  marketplace-feed-api:
     build:
       dockerfile: ./Dockerfile
       context: ./
