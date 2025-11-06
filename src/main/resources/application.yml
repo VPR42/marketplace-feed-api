@@ -5,5 +5,8 @@ spring:
   application:
     name: marketplace-feed-api
 
+  datasource:
+    driver-class: org.postgresql.Driver
+
 server:
   port: 33303

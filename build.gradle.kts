@@ -9,6 +9,10 @@ plugins {
 group = "com.vpr42"
 version = "1.0.0"
 
+val lombokVersion: String by project
+val postgresDriverVersion: String by project
+
+
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:2025.0.0")
@@ -21,16 +25,29 @@ repositories {
 
 dependencies {
     // Spring
-    implementation("org.springframework.boot:spring-boot-starter") // Удалить при добавлении хоть какой-то либы ибо они уже будут содержать этот стартер как родительский
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
+    // Postgres Driver
+    implementation("org.postgresql:postgresql:$postgresDriverVersion")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok:$lombokVersion")
+    annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
     // Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
-    implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
 
     // Logging
     runtimeOnly("io.github.oshai:kotlin-logging-jvm:7.0.7")
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    // Test
+    testCompileOnly("org.projectlombok:lombok:$lombokVersion")
+    testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
 }
 
 configurations {
