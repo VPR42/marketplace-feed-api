@@ -1,7 +1,7 @@
 package com.vpr42.marketplacefeedapi.service;
 
-import com.vpr42.marketplacefeedapi.model.entity.User;
+import com.vpr42.marketplacefeedapi.model.dto.UserDto;
 
 public interface TestService {
-    User getTestUser();
+    UserDto getTestUser();
 }

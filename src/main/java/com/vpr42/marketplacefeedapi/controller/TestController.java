@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     TestService testService;
-    UserFabric userFabric;
 
     // Доступно по /api/test
     @GetMapping
@@ -32,9 +31,7 @@ public class TestController {
         log.info("Processing new request");
 
         return ResponseEntity
-            .ok(
-                userFabric.fromEntity(testService.getTestUser())
-            );
+            .ok(testService.getTestUser());
     }
 
 }

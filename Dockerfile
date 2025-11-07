@@ -19,4 +19,4 @@ WORKDIR /app
 EXPOSE 33303
 
 COPY --from=builder /home/gradle/src/build/libs/*.jar app.jar
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
