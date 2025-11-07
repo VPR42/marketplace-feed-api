@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@ToString(exclude = {"city", "masterInfo", "favouriteServices", "orders"})
+@ToString(exclude = {"masterInfo", "favouriteServices", "orders"})
 @EqualsAndHashCode(exclude = {"city", "masterInfo", "favouriteServices", "orders"})
 public class User {
 
@@ -54,8 +55,10 @@ public class User {
     MasterInfo masterInfo;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    List<FavouriteService> favouriteServices;
+    @Builder.Default
+    List<FavouriteService> favouriteServices = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    List<Order> orders;
+    @Builder.Default
+    List<Order> orders = new ArrayList<>();
 }

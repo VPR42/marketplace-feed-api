@@ -19,7 +19,8 @@ public class FavouriteService {
     FavouriteKey key;
 
     @Column(name = "created_at")
-    Instant createdAt;
+    @Builder.Default
+    Instant createdAt = Instant.now();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")

@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,7 +36,7 @@ public class Service {
     @Column(name = "price", nullable = false)
     BigDecimal price;
 
-    @Column(name = "cover_url", nullable = true)
+    @Column(name = "cover_url")
     String coverUrl;
 
     @Column(name = "created_at", nullable = false)
@@ -57,5 +57,6 @@ public class Service {
         joinColumns = @JoinColumn(name = "service_id"),
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    Set<Tag> tags;
+    @Builder.Default
+    Set<Tag> tags = new HashSet<>();
 }

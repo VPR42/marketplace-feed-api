@@ -30,7 +30,8 @@ public class Order {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    OrderStatus status;
+    @Builder.Default
+    OrderStatus status = OrderStatus.NEW;
 
     @Column(name = "ordered_at", nullable = false)
     @Builder.Default

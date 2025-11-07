@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,16 +29,16 @@ public class MasterInfo {
     @Column(name = "experience", nullable = false)
     Integer experience;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description")
     String description;
 
-    @Column(name = "pseudonym", nullable = true, unique = true)
+    @Column(name = "pseudonym", unique = true)
     String pseudonym;
 
     @Column(name = "phone_number", nullable = false, unique = true)
     String phoneNumber;
 
-    @Column(name = "working_hours", nullable = true)
+    @Column(name = "working_hours")
     String workingHours;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
@@ -47,5 +47,6 @@ public class MasterInfo {
         joinColumns = @JoinColumn(name = "master_id"),
         inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
-    Set<Skill> skills;
+    @Builder.Default
+    Set<Skill> skills = new HashSet<>();
 }
