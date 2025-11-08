@@ -1,6 +1,7 @@
 package com.vpr42.marketplacefeedapi.service.impl;
 
 import com.vpr42.marketplacefeedapi.model.dto.User;
+import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.service.TestService;
 import com.vpr42.marketplacefeedapi.utils.UserMapper;
@@ -26,6 +27,7 @@ public class TestServiceImpl implements TestService {
                 .name("TEST")
                 .password("TEST")
                 .email("test@mail.ru")
+                .city(new CityEntity(1, "Ростовская область", "Ростов-на-Дону"))
                 .build();
 
         log.info("Test data was created: {}", user);

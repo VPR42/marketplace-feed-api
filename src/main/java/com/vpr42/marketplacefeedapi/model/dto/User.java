@@ -1,7 +1,5 @@
 package com.vpr42.marketplacefeedapi.model.dto;
 
-import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
-
 import java.util.UUID;
 
 public record User(
@@ -11,5 +9,5 @@ public record User(
     String surname,
     String patronymic,
     String avatarPath,
-    CityEntity city
+    City city
 ) { }

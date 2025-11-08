@@ -15,7 +15,7 @@ public class UserMapper {
             user.getSurname(),
             user.getPatronymic(),
             user.getAvatarPath(),
-            user.getCity()
+            CityMapper.fromEntity(user.getCity())
         );
     }
 }
