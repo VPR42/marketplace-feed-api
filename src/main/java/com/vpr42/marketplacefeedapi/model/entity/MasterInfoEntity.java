@@ -1,13 +1,32 @@
 package com.vpr42.marketplacefeedapi.model.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Сущность доп. инфы о мастере в БД
+ */
 @Entity
 @Table(name = "masters_info")
 @Data
@@ -17,14 +36,14 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString(exclude = {"user", "skills"})
 @EqualsAndHashCode(exclude = {"user", "skills"})
-public class MasterInfo {
+public class MasterInfoEntity {
     @Id
     UUID id;
 
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")
-    User user;
+    UserEntity user;
 
     @Column(name = "experience", nullable = false)
     Integer experience;
@@ -48,5 +67,5 @@ public class MasterInfo {
         inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     @Builder.Default
-    Set<Skill> skills = new HashSet<>();
+    Set<SkillEntity> skills = new HashSet<>();
 }

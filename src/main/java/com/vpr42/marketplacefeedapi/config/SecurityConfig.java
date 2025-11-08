@@ -8,7 +8,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
-// Настройка конфигурации безопасности, сейчас просто разрешает любой запрос
+/**
+ * Настройка конфигурации безопасности, сейчас просто разрешает любой запрос
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

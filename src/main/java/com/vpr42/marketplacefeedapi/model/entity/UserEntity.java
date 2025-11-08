@@ -1,7 +1,24 @@
 package com.vpr42.marketplacefeedapi.model.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
@@ -9,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сущность пользователя в БД
+ */
 @Entity
 @Table(name = "users")
 @Data
@@ -18,7 +38,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString(exclude = {"masterInfo", "favouriteServices", "orders"})
 @EqualsAndHashCode(exclude = {"city", "masterInfo", "favouriteServices", "orders"})
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -49,16 +69,16 @@ public class User {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city")
-    City city;
+    CityEntity city;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
-    MasterInfo masterInfo;
+    MasterInfoEntity masterInfo;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @Builder.Default
-    List<FavouriteService> favouriteServices = new ArrayList<>();
+    List<FavouriteServiceEntity> favouriteServices = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @Builder.Default
-    List<Order> orders = new ArrayList<>();
+    List<OrderEntity> orders = new ArrayList<>();
 }

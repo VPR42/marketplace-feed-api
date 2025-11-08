@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Slf4j
 @ControllerAdvice
 public class ExceptionHandlingControllerAdvice {
-    // Сюда будем добавлять разные виды исключений и их обработку
-    // Handler пишется по такому принципу
+
+    /**
+     * Сюда будем добавлять разные виды исключений и их обработку
+     * Handler пишется по такому принципу
+     */
     @ExceptionHandler
     public ResponseEntity<?> handleException(Exception ex) {
         log.error("An error occurred processing request", ex);
