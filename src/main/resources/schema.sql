@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS cities (
   id    SERIAL     PRIMARY KEY,
   region  VARCHAR(55) NOT NULL,
   name  VARCHAR(55) NOT NULL
-
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_region_city_name ON cities (region, name);
@@ -22,7 +21,7 @@ CREATE TABLE IF NOT EXISTS users
     patronymic   VARCHAR(100) NOT NULL,
     avatar_path  TEXT         NOT NULL,
     created_at   TIMESTAMP    NOT NULL,
-  city     INT      NOT NULL REFERENCES cities ON DELETE RESTRICT
+    city     INT      NOT NULL REFERENCES cities ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS skills (
