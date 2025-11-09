@@ -29,8 +29,10 @@ public class DevSecurityConfig {
             .authorizeHttpRequests(req -> req
                     .requestMatchers("/swagger-ui/**")
                     .permitAll()
+                    .requestMatchers("/v3/api-docs*/**")
+                    .permitAll()
                     .anyRequest()
-                    .denyAll());
+                    .authenticated());
         return http.build();
     }
 }
