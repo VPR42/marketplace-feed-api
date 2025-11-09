@@ -1,4 +1,4 @@
-package com.vpr42.marketplacefeedapi.service;
+package com.vpr42.marketplacefeedapi.config.authorization;
 
 import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
 import com.vpr42.marketplacefeedapi.model.entity.MasterInfoEntity;
@@ -8,7 +8,7 @@ import com.vpr42.marketplacefeedapi.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -17,10 +17,10 @@ import java.util.UUID;
 /**
  * Инициализирует начальные данные для Dev-режима
  */
-@Service
 @Profile("dev")
+@Component
 @RequiredArgsConstructor
-public class DevDataInitializerService {
+public class DevDataInitializer {
     private final CityRepository cityRepository;
     private final UserRepository userRepository;
 
