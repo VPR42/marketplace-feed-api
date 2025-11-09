@@ -4,7 +4,7 @@ import com.vpr42.marketplacefeedapi.model.dto.User;
 import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.service.TestService;
-import com.vpr42.marketplacefeedapi.utils.UserMapper;
+import com.vpr42.marketplacefeedapi.utils.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

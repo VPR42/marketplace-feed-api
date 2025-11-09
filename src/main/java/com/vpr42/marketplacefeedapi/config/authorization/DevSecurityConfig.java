@@ -1,7 +1,6 @@
-package com.vpr42.marketplacefeedapi.config;
+package com.vpr42.marketplacefeedapi.config.authorization;
 
-import com.vpr42.marketplacefeedapi.security.DevPreAuthenticationFilter;
-import lombok.SneakyThrows;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,19 +16,20 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
  * */
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class DevSecurityConfig {
+    private final DevPreAuthenticationFilter devPreAuthenticationFilter;
+
     @Bean
-    @SneakyThrows
     @Profile("dev")
-    public SecurityFilterChain filterChain(HttpSecurity http) {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .addFilterBefore(new DevPreAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+            .csrf(AbstractHttpConfigurer::disable)
+            .addFilterBefore(devPreAuthenticationFilter, AbstractPreAuthenticatedProcessingFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(req -> req
-                    .requestMatchers("/swagger-ui/**")
-                    .permitAll()
-                    .requestMatchers("/v3/api-docs*/**")
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs*/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated());

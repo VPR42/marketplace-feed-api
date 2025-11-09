@@ -1,7 +1,9 @@
 package com.vpr42.marketplacefeedapi.controller;
 
-import com.vpr42.marketplacefeedapi.security.UserDetailsEntity;
+import com.vpr42.marketplacefeedapi.model.dto.User;
+import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.service.TestService;
+import com.vpr42.marketplacefeedapi.utils.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -26,11 +28,11 @@ public class TestController {
      * Доступно по /api/test
      */
     @GetMapping
-    public ResponseEntity<UserDetailsEntity> getTestData(@AuthenticationPrincipal UserDetailsEntity user) {
+    public ResponseEntity<User> getTestData(@AuthenticationPrincipal UserEntity user) {
         log.info("Processing new test request");
 
         return ResponseEntity
-            .ok(user);
+            .ok(UserMapper.fromEntity(user));
     }
 
 }

@@ -1,38 +1,39 @@
-package com.vpr42.marketplacefeedapi.security;
+package com.vpr42.marketplacefeedapi.config.authorization;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
 
 /**
  * Dev Only, задает стандартного пользователя для любого request-а
  */
+@Component
+@RequiredArgsConstructor
 public class DevPreAuthenticationFilter extends OncePerRequestFilter {
+    private static final String TEST_USER_EMAIL = "test@mail.ru";
+
+    private final UserDetailsService userDetailsService;
 
     @Override
-    @SneakyThrows
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) {
+                                    FilterChain filterChain) throws ServletException, IOException  {
+
+        UserDetails user = userDetailsService.loadUserByUsername(TEST_USER_EMAIL);
         var auth = new PreAuthenticatedAuthenticationToken(
-                new UserDetailsEntity(
-                        UUID.fromString("58da1841-6609-4d27-949e-73218ce48922"),
-                    "test@mail.ru",
-                        Instant.now()
-                ),
+                user,
                 null,
-                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                user.getAuthorities()
         );
 
         SecurityContextHolder.getContext().setAuthentication(auth);

@@ -1,4 +1,4 @@
-package com.vpr42.marketplacefeedapi.utils;
+package com.vpr42.marketplacefeedapi.utils.mappers;
 
 import com.vpr42.marketplacefeedapi.model.dto.City;
 import com.vpr42.marketplacefeedapi.model.entity.CityEntity;

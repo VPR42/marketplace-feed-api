@@ -9,5 +9,6 @@ public record User(
     String surname,
     String patronymic,
     String avatarPath,
-    City city
+    City city,
+    Master master
 ) { }

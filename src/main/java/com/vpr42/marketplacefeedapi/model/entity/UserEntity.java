@@ -7,6 +7,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -18,9 +21,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +43,20 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString(exclude = {"masterInfo", "favouriteServices", "orders"})
 @EqualsAndHashCode(exclude = {"city", "masterInfo", "favouriteServices", "orders"})
-public class UserEntity {
+@NamedEntityGraph(
+    name = "UserEntity_withAdditionalInfo",
+    attributeNodes = {
+            @NamedAttributeNode("city"),
+            @NamedAttributeNode(value = "masterInfo", subgraph = "subgraph.masterInfo")
+    },
+    subgraphs = {
+        @NamedSubgraph(
+            name = "subgraph.masterInfo",
+            attributeNodes = { @NamedAttributeNode("skills") }
+        )
+    }
+)
+public class UserEntity implements UserDetails {
 
     @Id
     @Column(name = "id")
@@ -78,4 +98,14 @@ public class UserEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @Builder.Default
     List<OrderEntity> orders = new ArrayList<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("USER"));
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
 }

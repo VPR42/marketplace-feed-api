@@ -5,8 +5,8 @@ import com.vpr42.marketplacefeedapi.model.entity.MasterInfoEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.repository.CityRepository;
 import com.vpr42.marketplacefeedapi.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,16 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Инициализирует начальные данные для Dev-режима
+ */
 @Service
 @Profile("dev")
 @RequiredArgsConstructor
-public class DevDataInitializerService implements CommandLineRunner {
+public class DevDataInitializerService {
     private final CityRepository cityRepository;
     private final UserRepository userRepository;
 
-    @Override
+    @PostConstruct
     @Transactional
-    public void run(String... args) {
+    public void initialize() {
         if (cityRepository.count() > 0)
             return;
 
