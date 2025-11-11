@@ -1,4 +1,4 @@
-package com.vpr42.marketplacefeedapi.utils;
+package com.vpr42.marketplacefeedapi.mappers;
 
 import com.vpr42.marketplacefeedapi.model.dto.User;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
@@ -15,7 +15,8 @@ public class UserMapper {
             user.getSurname(),
             user.getPatronymic(),
             user.getAvatarPath(),
-            CityMapper.fromEntity(user.getCity())
+            CityMapper.fromEntity(user.getCity()),
+            MasterInfoMapper.fromEntity(user.getMasterInfo())
         );
     }
 }

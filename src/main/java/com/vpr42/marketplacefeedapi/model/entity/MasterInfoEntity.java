@@ -42,7 +42,7 @@ public class MasterInfoEntity {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "master_id")
     UserEntity user;
 
     @Column(name = "experience", nullable = false)
