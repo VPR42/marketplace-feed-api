@@ -4,10 +4,14 @@ import com.vpr42.marketplacefeedapi.model.dto.User;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Маппер для информации о пользователе
+ */
 @Slf4j
 public class UserMapper {
     public static User fromEntity(UserEntity user) {
         log.info("Converting entity {} to dto", user);
+
         return new User(
             user.getId(),
             user.getName(),

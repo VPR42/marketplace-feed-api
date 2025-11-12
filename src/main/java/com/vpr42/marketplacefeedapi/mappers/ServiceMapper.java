@@ -1,0 +1,34 @@
+package com.vpr42.marketplacefeedapi.mappers;
+
+import com.vpr42.marketplacefeedapi.model.dto.Service;
+import com.vpr42.marketplacefeedapi.model.entity.ServiceEntity;
+import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.stream.Collectors;
+
+/**
+ * Маппер для услуг
+ */
+@Slf4j
+public class ServiceMapper {
+    public Service fromEntity(ServiceEntity entity, int orderCount) {
+        log.info("Converting ServiceEntity to dto: {}", entity);
+
+        return new Service(
+            entity.getId(),
+            entity.getName(),
+            entity.getDescription(),
+            entity.getPrice(),
+            entity.getCoverUrl(),
+            entity.getCreatedAt(),
+            UserMapper.fromEntity(entity.getMasterInfo().getUser()),
+            CategoryMapper.fromEntity(entity.getCategory()),
+            entity.getTags()
+                    .stream()
+                    .map(TagEntity::getName)
+                    .collect(Collectors.toSet()),
+            orderCount
+        );
+    }
+}
