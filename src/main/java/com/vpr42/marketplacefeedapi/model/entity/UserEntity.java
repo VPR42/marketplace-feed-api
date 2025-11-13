@@ -41,7 +41,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@ToString(exclude = {"masterInfo", "favouriteServices", "orders"})
+@ToString(exclude = {"masterInfo", "favouriteServices", "orders", "password"})
 @EqualsAndHashCode(exclude = {"city", "masterInfo", "favouriteServices", "orders"})
 @NamedEntityGraph(
     name = "UserEntity_withAdditionalInfo",

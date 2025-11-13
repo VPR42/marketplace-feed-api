@@ -1,11 +1,10 @@
 package com.vpr42.marketplacefeedapi.model.dto;
 
 /**
- * Dto с информацией о городе
+ * Dto для категории
  */
-public record City(
+public record Category(
     Integer id,
-    String region,
     String name
 ) {
 }

@@ -28,11 +28,10 @@ public class TestController {
      * Доступно по /api/test
      */
     @GetMapping
-    public ResponseEntity<User> getTestData(@AuthenticationPrincipal UserEntity user) {
+    public User getTestData(@AuthenticationPrincipal UserEntity user) {
         log.info("Processing new test request");
 
-        return ResponseEntity
-            .ok(UserMapper.fromEntity(user));
+        return UserMapper.fromEntity(user);
     }
 
 }
