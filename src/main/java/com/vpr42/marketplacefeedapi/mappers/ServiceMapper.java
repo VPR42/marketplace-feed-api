@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class ServiceMapper {
-    public Service fromEntity(ServiceEntity entity, int orderCount) {
+    public static Service fromEntity(ServiceEntity entity, int orderCount) {
         log.info("Converting ServiceEntity to dto: {}", entity);
 
         return new Service(
@@ -36,7 +36,7 @@ public class ServiceMapper {
         );
     }
 
-    public ServiceEntity toEntity(CreateServiceDto dto,
+    public static ServiceEntity toEntity(CreateServiceDto dto,
                                   Set<TagEntity> tags,
                                   CategoryEntity category,
                                   UserEntity user) {
