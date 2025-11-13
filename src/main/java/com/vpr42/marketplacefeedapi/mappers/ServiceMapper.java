@@ -1,10 +1,14 @@
 package com.vpr42.marketplacefeedapi.mappers;
 
+import com.vpr42.marketplacefeedapi.model.dto.CreateServiceDto;
 import com.vpr42.marketplacefeedapi.model.dto.Service;
+import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
 import com.vpr42.marketplacefeedapi.model.entity.ServiceEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
+import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -30,5 +34,22 @@ public class ServiceMapper {
                     .collect(Collectors.toSet()),
             orderCount
         );
+    }
+
+    public ServiceEntity toEntity(CreateServiceDto dto,
+                                  Set<TagEntity> tags,
+                                  CategoryEntity category,
+                                  UserEntity user) {
+        log.info("Converting CreateServiceDto to entity: {} for user with id: {}", dto, user.getId());
+
+        return ServiceEntity.builder()
+                .name(dto.name())
+                .description(dto.description())
+                .price(dto.price())
+                .coverUrl(dto.coverUrl())
+                .category(category)
+                .masterInfo(user.getMasterInfo())
+                .tags(tags)
+                .build();
     }
 }
