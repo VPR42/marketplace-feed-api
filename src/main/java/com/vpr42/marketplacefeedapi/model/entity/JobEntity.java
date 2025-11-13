@@ -30,7 +30,7 @@ import java.util.UUID;
  * Сущность услуги в БД
  */
 @Entity
-@Table(name = "services")
+@Table(name = "jobs")
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -38,7 +38,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString(exclude = {"tags", "masterInfo", "category"})
 @EqualsAndHashCode(exclude = {"tags", "masterInfo", "category"})
-public class ServiceEntity {
+public class JobEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
@@ -70,8 +70,8 @@ public class ServiceEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "services_tags",
-        joinColumns = @JoinColumn(name = "service_id"),
+        name = "job_tags",
+        joinColumns = @JoinColumn(name = "job_id"),
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     @Builder.Default

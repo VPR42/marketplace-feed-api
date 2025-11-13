@@ -42,8 +42,8 @@ public class OrderEntity {
     UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id")
-    ServiceEntity service;
+    @JoinColumn(name = "job_id")
+    JobEntity job;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

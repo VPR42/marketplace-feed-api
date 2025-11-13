@@ -4,6 +4,7 @@ import com.vpr42.marketplacefeedapi.model.dto.ApiErrorResponse;
 import com.vpr42.marketplacefeedapi.model.enums.ApiError;
 import com.vpr42.marketplacefeedapi.model.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,8 +32,9 @@ public class ExceptionHandlingControllerAdvice {
         return ResponseEntity
                 .badRequest()
                 .body(new ApiErrorResponse(
+                    HttpStatus.BAD_REQUEST.value(),
                     ApiError.INVALID_DATA,
-                    exception.getMessage(),
+                    "Invalid data",
                     errors
                 ));
     }
@@ -47,6 +49,7 @@ public class ExceptionHandlingControllerAdvice {
         return ResponseEntity
                 .status(exception.getStatusCode())
                 .body(new ApiErrorResponse(
+                    exception.getStatusCode().value(),
                     exception.getError(),
                     exception.getMessage()
                 ));

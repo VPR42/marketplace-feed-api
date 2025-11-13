@@ -29,7 +29,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FavouriteServiceEntity {
+public class FavouriteJobEntity {
     @EmbeddedId
     FavouriteKey key;
 
@@ -43,7 +43,7 @@ public class FavouriteServiceEntity {
     UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("serviceId")
-    @JoinColumn(name = "service_id")
-    ServiceEntity service;
+    @MapsId("jobId")
+    @JoinColumn(name = "job_id")
+    JobEntity service;
 }

@@ -6,12 +6,17 @@ import java.util.List;
 import java.util.Map;
 
 public record ApiErrorResponse(
+    Integer status,
     ApiError errorCode,
     String message,
-    Map<String,
-    List<String>> errors
+    Map<String, List<String>> errors
 ) {
-    public ApiErrorResponse(ApiError errorCode, String message) {
-        this(errorCode, message, Map.of());
+    public ApiErrorResponse(Integer status, ApiError errorCode, String message) {
+        this(
+            status,
+            errorCode,
+            message,
+            Map.of()
+        );
     }
 }
