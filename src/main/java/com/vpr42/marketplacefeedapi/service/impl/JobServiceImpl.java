@@ -38,14 +38,17 @@ public class JobServiceImpl implements JobService {
     public Job createJob(CreateJobDto dto, UserEntity initiator) {
         CategoryEntity categoryEntity = categoryRepository.findById(dto.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(dto.categoryId()));
+        log.info("Fetched category: {} for createJob for user: {}", categoryEntity.getName(), initiator.getId());
 
         Set<TagEntity> tags = tagsRepository.findByNameIn(dto.tags());
+        log.info("Fetched tags: {} for createJob for user: {}", tags, initiator.getId());
         if (tags.size() < dto.tags().size()) {
             Set<String> presentedName = tags.stream()
                     .map(TagEntity::getName)
                     .collect(Collectors.toSet());
             // Удаляем тэги, которые есть в БД
             dto.tags().removeAll(presentedName);
+            log.info("Given tags are absent: {}", dto.tags());
 
             throw new TagsNotFoundException(dto.tags());
         }
