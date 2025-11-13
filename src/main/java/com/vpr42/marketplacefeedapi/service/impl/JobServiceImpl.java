@@ -10,6 +10,7 @@ import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.model.enums.ApiError;
 import com.vpr42.marketplacefeedapi.model.exception.ApplicationException;
 import com.vpr42.marketplacefeedapi.model.exception.CategoryNotFoundException;
+import com.vpr42.marketplacefeedapi.model.exception.JobAlreadyExistsForUser;
 import com.vpr42.marketplacefeedapi.model.exception.TagsNotFoundException;
 import com.vpr42.marketplacefeedapi.repository.CategoryRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,11 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public Job createJob(CreateJobDto dto, UserEntity initiator) {
+        Optional<JobEntity> oldJob = jobRepository.findByMasterIdAndName(initiator.getId(), dto.name());
+
+        if (oldJob.isPresent())
+            throw new JobAlreadyExistsForUser(dto.name());
+
         CategoryEntity categoryEntity = categoryRepository.findById(dto.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(dto.categoryId()));
         log.info("Fetched category: {} for createJob for user: {}", categoryEntity.getName(), initiator.getId());

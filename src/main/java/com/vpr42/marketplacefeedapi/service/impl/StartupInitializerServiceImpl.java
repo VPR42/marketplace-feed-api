@@ -5,6 +5,7 @@ import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
 import com.vpr42.marketplacefeedapi.repository.CategoryRepository;
 import com.vpr42.marketplacefeedapi.repository.TagsRepository;
 import com.vpr42.marketplacefeedapi.service.StartupInitializerService;
+import com.vpr42.marketplacefeedapi.utils.DataInitializerConstants;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,39 +32,13 @@ public class StartupInitializerServiceImpl implements StartupInitializerService 
             return;
         }
 
-        List<String> categoriesName = List.of(
-                "Электроника",
-                "Уборка",
-                "Мелкий ремонт",
-                "Сантехника",
-                "IT-услуги",
-                "Кондиционеры",
-                "Сборка мебели",
-                "Монтажные работы",
-                "Ремонт",
-                "Автомобили"
-        );
-        List<String> tagNames = List.of(
-                "Экологичная химия",
-                "Мытьё окон",
-                "Своё оборудование",
-                "Гарантия",
-                "Срочный вызов",
-                "24/7",
-                "После ремонта",
-                "Химчистка",
-                "Безнал",
-                "Наличные",
-                "Выезд сегодня",
-                "Чек и договор"
-        );
-        List<CategoryEntity> startupCategoriesData = categoriesName.stream()
+        List<CategoryEntity> startupCategoriesData = DataInitializerConstants.CategoryNames.stream()
                 .map(category -> CategoryEntity
                         .builder()
                         .name(category)
                         .build())
                 .toList();
-        List<TagEntity> startupTagEntitiesData = tagNames.stream()
+        List<TagEntity> startupTagEntitiesData = DataInitializerConstants.TagNames.stream()
                 .map(tag -> TagEntity
                         .builder()
                         .name(tag)

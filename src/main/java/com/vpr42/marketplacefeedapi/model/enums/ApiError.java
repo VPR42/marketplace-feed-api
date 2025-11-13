@@ -4,5 +4,6 @@ package com.vpr42.marketplacefeedapi.model.enums;
 public enum ApiError {
     INVALID_DATA,
     TAGS_NOT_FOUND,
-    CATEGORY_NOT_FOUND
+    CATEGORY_NOT_FOUND,
+    JOB_ALREADY_EXISTS
 }
