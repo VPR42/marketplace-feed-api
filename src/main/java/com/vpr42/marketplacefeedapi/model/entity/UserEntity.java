@@ -93,7 +93,7 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @Builder.Default
-    List<FavouriteServiceEntity> favouriteServices = new ArrayList<>();
+    List<FavouriteJobEntity> favouriteServices = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @Builder.Default

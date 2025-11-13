@@ -17,7 +17,7 @@ import java.util.List;
  * @param categoryId Id категории
  * @param tags Список тэгов в виде строк
  */
-public record CreateServiceDto(
+public record CreateJobDto(
     @NotNull(message = "Service name can't be null")
     @Size(min = 5, message = "Service name '${validatedValue}' must be at least {value} characters long")
     String name,

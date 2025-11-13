@@ -16,6 +16,6 @@ import java.util.UUID;
 public class FavouriteKey {
     @Column(name = "user_id")
     UUID userId;
-    @Column(name = "service_id")
-    UUID serviceId;
+    @Column(name = "job_id")
+    UUID jobId;
 }
