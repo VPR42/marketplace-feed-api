@@ -18,18 +18,18 @@ import java.util.List;
  * @param tags Список тэгов в виде строк
  */
 public record CreateJobDto(
-    @NotNull(message = "Service name can't be null")
-    @Size(min = 5, message = "Service name '${validatedValue}' must be at least {value} characters long")
+    @NotNull(message = "Job name can't be null")
+    @Size(min = 5, message = "Job name must be at least {min} characters long")
     String name,
-    @NotNull(message = "Service description can't be null")
-    @Size(min = 20, message = "Service description must be at least {value} characters long")
+    @NotNull(message = "Job description can't be null")
+    @Size(min = 20, message = "Job description must be at least {min} characters long")
     String description,
-    @DecimalMin(value = "100", message = "Service price ${formatter.format('%1$.2f', validatedValue)} must be higher than {value}")
+    @DecimalMin(value = "100", message = "Job price ${formatter.format('%1$.2f', validatedValue)} must be higher than {value}")
     BigDecimal price,
     String coverUrl,
-    @NotNull(message = "Service must have category")
+    @NotNull(message = "Job must have category")
     Integer categoryId,
-    @NotEmpty(message = "Service must have at least 1 tag")
+    @NotEmpty(message = "Job must have at least 1 tag")
     List<String> tags
 ) {
 }

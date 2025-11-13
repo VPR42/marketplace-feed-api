@@ -34,7 +34,7 @@ public class ExceptionHandlingControllerAdvice {
                 .body(new ApiErrorResponse(
                     HttpStatus.BAD_REQUEST.value(),
                     ApiError.INVALID_DATA,
-                    exception.getMessage(),
+                    "Invalid data",
                     errors
                 ));
     }
