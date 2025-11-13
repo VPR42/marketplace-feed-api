@@ -13,24 +13,6 @@ services:
       - backend
     ports:
       - "33303:33303"
-    depends_on:
-      - db
-
-  db:
-    container_name: database
-    image: postgres:18.0-alpine
-    restart: always
-    env_file:
-      - dev.env
-    volumes:
-      - pg_db:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - backend
 
 networks:
   backend:
-
-volumes:
-  pg_db:
