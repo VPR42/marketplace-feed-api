@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   master_id     UUID            NOT NULL REFERENCES users ON DELETE CASCADE,
   name          VARCHAR(100)    NOT NULL,
   description   TEXT            NOT NULL,
-  price         DECIMAL(5,2)    NOT NULL CHECK (price > 0),
+  price         DECIMAL(10,2)   NOT NULL CHECK (price > 0),
   cover_url     VARCHAR(255)    NULL,
   category_id   INT             NOT NULL REFERENCES categories ON DELETE RESTRICT,
   created_at    TIMESTAMP       WITH TIME ZONE NOT NULL

@@ -70,8 +70,8 @@ public class JobEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "services_tags",
-        joinColumns = @JoinColumn(name = "service_id"),
+        name = "job_tags",
+        joinColumns = @JoinColumn(name = "job_id"),
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     @Builder.Default
