@@ -1,8 +1,8 @@
 spring:
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
+  datasource:
+    url: jdbc:postgresql://kinoko.su:5432/mp_db_dev
+    username: mp_dev_user
+    password: mp_dev_passwd
 
   jpa:
     show-sql: true
