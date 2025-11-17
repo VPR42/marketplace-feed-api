@@ -40,7 +40,7 @@ public class FavouriteServiceImpl implements FavouriteService {
         if (isUserJobOwner(job, user)) {
             log.warn("User {} attempted to add their own job {} to favourites", user.getId(), dto.jobId());
 
-            throw new SelfFavouriteException("You cannot add your own job to favourites");
+            throw new SelfFavouriteException();
         }
 
         FavouriteKey key = new FavouriteKey(user.getId(), dto.jobId());
