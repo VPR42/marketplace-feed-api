@@ -5,6 +5,7 @@ import com.vpr42.marketplacefeedapi.model.entity.FavouriteJobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.model.entity.keys.FavouriteKey;
+import com.vpr42.marketplacefeedapi.model.exception.JobNotFoundException;
 import com.vpr42.marketplacefeedapi.repository.FavouriteJobRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
 import com.vpr42.marketplacefeedapi.service.FavouriteService;
@@ -32,7 +33,7 @@ public class FavouriteServiceImpl implements FavouriteService {
         }
 
         JobEntity job = jobRepository.findById(dto.jobId())
-                .orElseThrow(() -> new IllegalArgumentException("Job not found with id: " + dto.jobId()));
+                .orElseThrow(() -> new JobNotFoundException(dto.jobId()));
 
         FavouriteKey key = new FavouriteKey(user.getId(), dto.jobId());
         FavouriteJobEntity favourite = FavouriteJobEntity.builder()

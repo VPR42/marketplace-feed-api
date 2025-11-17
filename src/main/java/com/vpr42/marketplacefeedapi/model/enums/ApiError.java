@@ -5,5 +5,6 @@ public enum ApiError {
     INVALID_DATA,
     TAGS_NOT_FOUND,
     CATEGORY_NOT_FOUND,
-    JOB_ALREADY_EXISTS
+    JOB_ALREADY_EXISTS,
+    JOB_NOT_FOUND,
 }
