@@ -6,6 +6,7 @@ import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.model.entity.keys.FavouriteKey;
 import com.vpr42.marketplacefeedapi.model.exception.JobNotFoundException;
+import com.vpr42.marketplacefeedapi.model.exception.SelfFavouriteException;
 import com.vpr42.marketplacefeedapi.repository.FavouriteJobRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
 import com.vpr42.marketplacefeedapi.service.FavouriteService;
@@ -35,6 +36,13 @@ public class FavouriteServiceImpl implements FavouriteService {
         JobEntity job = jobRepository.findById(dto.jobId())
                 .orElseThrow(() -> new JobNotFoundException(dto.jobId()));
 
+        // Проверяем, что пользователь не пытается добавить свою же услугу
+        if (isUserJobOwner(job, user)) {
+            log.warn("User {} attempted to add their own job {} to favourites", user.getId(), dto.jobId());
+
+            throw new SelfFavouriteException("You cannot add your own job to favourites");
+        }
+
         FavouriteKey key = new FavouriteKey(user.getId(), dto.jobId());
         FavouriteJobEntity favourite = FavouriteJobEntity.builder()
                 .key(key)
@@ -52,5 +60,17 @@ public class FavouriteServiceImpl implements FavouriteService {
         FavouriteKey key = new FavouriteKey(user.getId(), jobId);
 
         return favouriteJobRepository.existsById(key);
+    }
+
+    /**
+     * Проверяет, является ли пользователь владельцем услуги
+     * @param job услуга для проверки
+     * @param user пользователь
+     * @return true если пользователь владелец услуги, иначе false
+     */
+    private boolean isUserJobOwner(JobEntity job, UserEntity user) {
+        return job.getMasterInfo() != null &&
+                job.getMasterInfo().getUser() != null &&
+                job.getMasterInfo().getUser().getId().equals(user.getId());
     }
 }

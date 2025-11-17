@@ -7,4 +7,5 @@ public enum ApiError {
     CATEGORY_NOT_FOUND,
     JOB_ALREADY_EXISTS,
     JOB_NOT_FOUND,
+    SELF_FAVOURITE
 }
