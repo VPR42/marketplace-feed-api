@@ -30,25 +30,28 @@ public class JobFilteringSpecification {
             Join<MasterInfoEntity, SkillEntity> skills = null;
             Join<UserEntity, CityEntity> city = null;
 
+            boolean hasTags = filters.getTags() != null && filters.getTags().length > 0;
+            boolean hasSkills = filters.getSkills() != null && filters.getSkills().length > 0;
+
             // Билдим необходимые Join-ы
             if (filters.getMasterId() != null
                     || filters.getExperience() != null
                     || filters.getExperienceSort() != null
-                    || filters.getSkills() != null
+                    || hasSkills
                     || filters.getCityId() != null
                     || filters.getQuery() != null) {
-
+                masterInfo = root.join("masterInfo");
             }
 
             if (filters.getCityId() != null) {
                 user = masterInfo.join("user");
                 city = user.join("city");
             }
-            if (filters.getSkills() != null && filters.getSkills().length > 0) {
+            if (hasSkills) {
                 skills = masterInfo.join("skills", JoinType.LEFT);
                 query.distinct(true);
             }
-            if (filters.getTags() != null && filters.getTags().length > 0) {
+            if (hasTags) {
                 tags = root.join("tags", JoinType.LEFT);
                 query.distinct(true);
             }
@@ -95,8 +98,6 @@ public class JobFilteringSpecification {
             }
 
             // Группировка и having
-            boolean hasTags = filters.getTags() != null;
-            boolean hasSkills = filters.getSkills() != null;
             boolean hasOrdersJoin = orders != null;
             List<Predicate> havings = new ArrayList<>();
 

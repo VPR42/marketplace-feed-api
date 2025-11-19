@@ -103,6 +103,6 @@ public class JobServiceImpl implements JobService {
                 .collect(Collectors.toMap(Job::id, v -> v));
 
         return jobIdsFiltered
-                .map(jobsWithKeys::get);
+                .map(el -> jobsWithKeys.get(el.getId()));
     }
 }
