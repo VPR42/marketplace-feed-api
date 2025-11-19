@@ -8,8 +8,10 @@ import com.vpr42.marketplacefeedapi.model.entity.OrderEntity;
 import com.vpr42.marketplacefeedapi.model.entity.SkillEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
+import com.vpr42.marketplacefeedapi.model.enums.SortType;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -82,6 +84,15 @@ public class JobFilteringSpecification {
                     )
                 );
             }
+            if (filters.getQuery() != null) {
+                String likeQuery = "%" + filters.getQuery().toLowerCase() + "%";
+                predicates.add(
+                    cb.or(
+                        cb.like(cb.lower(root.get("name")), likeQuery),
+                        cb.like(cb.lower(cb.coalesce(masterInfo.get("pseudonym"), "")), likeQuery)
+                    )
+                );
+            }
 
             // Группировка и having
             boolean hasTags = filters.getTags() != null;
@@ -107,6 +118,30 @@ public class JobFilteringSpecification {
 
             if (!havings.isEmpty()) {
                 query.having(cb.and(havings.toArray(new Predicate[0])));
+            }
+
+            // Сортировка
+            List<Order> sorts = new ArrayList<>();
+            if (filters.getPriceSort() != null) {
+                sorts.add(
+                    filters.getPriceSort() == SortType.ASC
+                        ? cb.asc(root.get("price"))
+                        : cb.desc(root.get("price"))
+                );
+            }
+            if (filters.getExperienceSort() != null) {
+                sorts.add(
+                    filters.getExperienceSort() == SortType.ASC
+                        ? cb.asc(masterInfo.get("experience"))
+                        : cb.desc(masterInfo.get("experience"))
+                );
+            }
+            if (filters.getMinOrders() != null) {
+                sorts.add(
+                    filters.getOrdersCountSort() == SortType.ASC
+                        ? cb.asc(cb.countDistinct(orders))
+                        : cb.desc(cb.countDistinct(orders))
+                );
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
