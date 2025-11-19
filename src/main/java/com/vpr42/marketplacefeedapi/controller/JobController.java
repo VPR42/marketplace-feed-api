@@ -41,6 +41,6 @@ public class JobController {
         @AuthenticationPrincipal UserEntity user
     ) {
         return ResponseEntity
-                .ok(null);
+                .ok(jobService.getJobsFiltered(filters));
     }
 }
