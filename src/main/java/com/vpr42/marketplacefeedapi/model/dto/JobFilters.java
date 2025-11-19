@@ -1,5 +1,6 @@
 package com.vpr42.marketplacefeedapi.model.dto;
 
+import com.vpr42.marketplacefeedapi.model.enums.SortType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -31,4 +32,7 @@ public class JobFilters {
     private Integer cityId;
     @Min(value = 0, message = "MinOrders must be positive or zero value")
     private Integer minOrders;
+    private SortType priceSort;
+    private SortType ordersCountSort;
+    private SortType experienceSort;
 }
