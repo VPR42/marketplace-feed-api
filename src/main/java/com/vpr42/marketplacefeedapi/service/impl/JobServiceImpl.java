@@ -1,8 +1,10 @@
 package com.vpr42.marketplacefeedapi.service.impl;
 
-import com.vpr42.marketplacefeedapi.mappers.ServiceMapper;
+import com.vpr42.marketplacefeedapi.mappers.JobsMapper;
 import com.vpr42.marketplacefeedapi.model.dto.CreateJobDto;
 import com.vpr42.marketplacefeedapi.model.dto.Job;
+import com.vpr42.marketplacefeedapi.model.dto.JobEntityWithCount;
+import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
 import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
@@ -11,20 +13,29 @@ import com.vpr42.marketplacefeedapi.model.enums.ApiError;
 import com.vpr42.marketplacefeedapi.model.exception.ApplicationException;
 import com.vpr42.marketplacefeedapi.model.exception.CategoryNotFoundException;
 import com.vpr42.marketplacefeedapi.model.exception.JobAlreadyExistsForUser;
+import com.vpr42.marketplacefeedapi.model.exception.JobsNotFoundException;
 import com.vpr42.marketplacefeedapi.model.exception.TagsNotFoundException;
 import com.vpr42.marketplacefeedapi.repository.CategoryRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
 import com.vpr42.marketplacefeedapi.repository.TagsRepository;
+import com.vpr42.marketplacefeedapi.repository.criteria.JobFilteringSpecification;
 import com.vpr42.marketplacefeedapi.service.JobService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -61,14 +72,33 @@ public class JobServiceImpl implements JobService {
         }
 
         try {
-            JobEntity entity = ServiceMapper.toEntity(dto, tags, categoryEntity, initiator);
+            JobEntity entity = JobsMapper.toEntity(dto, tags, categoryEntity, initiator);
             JobEntity createdService = jobRepository.save(entity);
 
-            return ServiceMapper.fromEntity(createdService, 0);
+            return JobsMapper.fromEntity(createdService, 0);
         } catch (DataAccessException exception) {
             log.error("An error occurred creating new service for user with id: {}", initiator.getId(), exception);
 
             throw new ApplicationException("Failed to create new service", ApiError.INVALID_DATA, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    @Transactional
+    public Page<Job> getJobsFiltered(JobFilters filters) {
+        Specification<UUID> criteriaSpec = JobFilteringSpecification.filter(filters);
+        Pageable pageable = PageRequest.of(filters.getPage(), filters.getPageSize());
+        Page<UUID> jobIdsFiltered = jobRepository.findIdsByFilters(criteriaSpec, pageable);
+        if (jobIdsFiltered.isEmpty()) {
+            throw new JobsNotFoundException();
+        }
+
+        List<JobEntityWithCount> jobs = jobRepository.findAllWithIdsIn(jobIdsFiltered.get().toList());
+        Map<UUID, Job> jobsWithKeys = jobs.stream()
+                .map(entity -> JobsMapper.fromEntity(entity.job(), entity.count()))
+                .collect(Collectors.toMap(Job::id, v -> v));
+
+        return jobIdsFiltered
+                .map(jobsWithKeys::get);
     }
 }

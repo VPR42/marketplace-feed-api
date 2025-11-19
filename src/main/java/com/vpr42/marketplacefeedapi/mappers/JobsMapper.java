@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Маппер для услуг
  */
 @Slf4j
-public class ServiceMapper {
+public class JobsMapper {
     public static Job fromEntity(JobEntity entity, int orderCount) {
         log.info("Converting ServiceEntity to dto: {}", entity);
 

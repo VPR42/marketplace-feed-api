@@ -17,13 +17,14 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class JobFilteringSpecification {
-    public static Specification<JobEntity> filter(JobFilters filters) {
+    public static Specification<UUID> filter(JobFilters filters) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            Join<JobEntity, MasterInfoEntity> masterInfo = null;
+            Join<JobEntity, MasterInfoEntity> masterInfo = root.join("masterInfo");;
             Join<JobEntity, TagEntity> tags = null;
             Join<JobEntity, OrderEntity> orders = null;
             Join<MasterInfoEntity, UserEntity> user = null;
@@ -37,7 +38,7 @@ public class JobFilteringSpecification {
                     || filters.getSkills() != null
                     || filters.getCityId() != null
                     || filters.getQuery() != null) {
-                masterInfo = root.join("masterInfo");
+
             }
 
             if (filters.getCityId() != null) {
