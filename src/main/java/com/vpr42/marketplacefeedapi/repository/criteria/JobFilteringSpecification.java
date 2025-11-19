@@ -44,11 +44,11 @@ public class JobFilteringSpecification {
                 user = masterInfo.join("user");
                 city = user.join("city");
             }
-            if (filters.getSkills() != null) {
+            if (filters.getSkills() != null && filters.getSkills().length > 0) {
                 skills = masterInfo.join("skills", JoinType.LEFT);
                 query.distinct(true);
             }
-            if (filters.getTags() != null) {
+            if (filters.getTags() != null && filters.getTags().length > 0) {
                 tags = root.join("tags", JoinType.LEFT);
                 query.distinct(true);
             }
@@ -84,7 +84,7 @@ public class JobFilteringSpecification {
                     )
                 );
             }
-            if (filters.getQuery() != null) {
+            if (filters.getQuery() != null && !filters.getQuery().isBlank()) {
                 String likeQuery = "%" + filters.getQuery().toLowerCase() + "%";
                 predicates.add(
                     cb.or(
