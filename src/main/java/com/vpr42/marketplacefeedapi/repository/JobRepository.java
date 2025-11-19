@@ -26,7 +26,6 @@ public interface JobRepository extends JpaRepository<JobEntity, UUID>, JpaSpecif
             AND job.name = :name
         """)
     Optional<JobEntity> findByMasterIdAndName(UUID masterId, String name);
-    Page<UUID> findIdsByFilters(Specification<UUID> spec, Pageable pageable);
 
     @Query("""
             SELECT new com.vpr42.marketplacefeedapi.model.dto.JobEntityWithCount(j, COUNT(o))

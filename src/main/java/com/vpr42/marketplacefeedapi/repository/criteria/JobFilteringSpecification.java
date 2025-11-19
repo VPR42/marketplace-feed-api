@@ -17,10 +17,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class JobFilteringSpecification {
-    public static Specification<UUID> filter(JobFilters filters) {
+    public static Specification<JobEntity> filter(JobFilters filters) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

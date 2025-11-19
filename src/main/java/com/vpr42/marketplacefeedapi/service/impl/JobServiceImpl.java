@@ -86,14 +86,18 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public Page<Job> getJobsFiltered(JobFilters filters) {
-        Specification<UUID> criteriaSpec = JobFilteringSpecification.filter(filters);
+        Specification<JobEntity> criteriaSpec = JobFilteringSpecification.filter(filters);
         Pageable pageable = PageRequest.of(filters.getPage(), filters.getPageSize());
-        Page<UUID> jobIdsFiltered = jobRepository.findIdsByFilters(criteriaSpec, pageable);
+        Page<JobEntity> jobIdsFiltered = jobRepository.findAll(criteriaSpec, pageable);
+
         if (jobIdsFiltered.isEmpty()) {
             throw new JobsNotFoundException();
         }
 
-        List<JobEntityWithCount> jobs = jobRepository.findAllWithIdsIn(jobIdsFiltered.get().toList());
+        List<UUID> ids = jobIdsFiltered.stream()
+                .map(JobEntity::getId)
+                .toList();
+        List<JobEntityWithCount> jobs = jobRepository.findAllWithIdsIn(ids);
         Map<UUID, Job> jobsWithKeys = jobs.stream()
                 .map(entity -> JobsMapper.fromEntity(entity.job(), entity.count()))
                 .collect(Collectors.toMap(Job::id, v -> v));
