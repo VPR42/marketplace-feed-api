@@ -18,6 +18,6 @@ public record Job(
     User master,
     Category category,
     Set<String> tags,
-    Integer ordersCount
+    Long ordersCount
 ) {
 }
