@@ -89,6 +89,7 @@ public class JobServiceImpl implements JobService {
         Specification<JobEntity> criteriaSpec = JobFilteringSpecification.filter(filters);
         Pageable pageable = PageRequest.of(filters.getPage(), filters.getPageSize());
         Page<JobEntity> jobIdsFiltered = jobRepository.findAll(criteriaSpec, pageable);
+        log.info("Fetched {} jobs by given filters", jobIdsFiltered.getSize());
 
         if (jobIdsFiltered.isEmpty()) {
             throw new JobsNotFoundException();
@@ -97,11 +98,13 @@ public class JobServiceImpl implements JobService {
         List<UUID> ids = jobIdsFiltered.stream()
                 .map(JobEntity::getId)
                 .toList();
-
+        log.info("ID's of entities that satisfies given filters: {}", ids);
+        log.info("Fetching jobs with given ids");
         List<JobEntity> jobs = jobRepository.findAllEntitiesWithIds(ids);
         Map<UUID, JobEntity> jobsById = jobs.stream()
                 .collect(Collectors.toMap(JobEntity::getId, v -> v));
 
+        log.info("Fetching count of orders for given ids");
         List<JobEntityWithCount> jobCounts = jobRepository.findOrdersCountFor(ids);
         Map<UUID, Long> jobsCount = jobCounts.stream()
                 .collect(Collectors.toMap(k -> k.job().getId(), JobEntityWithCount::count));
