@@ -1,6 +1,7 @@
 package com.vpr42.marketplacefeedapi.repository.criteria;
 
 import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
+import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
 import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.MasterInfoEntity;
@@ -9,116 +10,173 @@ import com.vpr42.marketplacefeedapi.model.entity.SkillEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.model.enums.SortType;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class JobFilteringSpecification {
+
     public static Specification<JobEntity> filter(JobFilters filters) {
         return (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
+            query.select(root.get("id"));
 
-            Join<JobEntity, MasterInfoEntity> masterInfo = root.join("masterInfo");;
-            Join<JobEntity, TagEntity> tags = null;
-            Join<JobEntity, OrderEntity> orders = null;
+            // Join-ы
+            Join<JobEntity, MasterInfoEntity> master = root.join("masterInfo");
+            Join<JobEntity, CategoryEntity> category = null;
             Join<MasterInfoEntity, UserEntity> user = null;
-            Join<MasterInfoEntity, SkillEntity> skills = null;
             Join<UserEntity, CityEntity> city = null;
+            Join<JobEntity, OrderEntity> orders = null;
 
-            boolean hasTags = filters.getTags() != null && filters.getTags().length > 0;
-            boolean hasSkills = filters.getSkills() != null && filters.getSkills().length > 0;
-
-            // Билдим необходимые Join-ы
-            if (filters.getMasterId() != null
-                    || filters.getExperience() != null
-                    || filters.getExperienceSort() != null
-                    || hasSkills
-                    || filters.getCityId() != null
-                    || filters.getQuery() != null) {
-                masterInfo = root.join("masterInfo");
+            if (filters.getCategoryId() != null && filters.getCategoryId() > 0) {
+                category = root.join("category");
             }
 
-            if (filters.getCityId() != null) {
-                user = masterInfo.join("user");
+            if (filters.getCityId() != null && filters.getCityId() > 0) {
+                user = master.join("user");
                 city = user.join("city");
             }
-            if (hasSkills) {
-                skills = masterInfo.join("skills", JoinType.LEFT);
-                query.distinct(true);
-            }
-            if (hasTags) {
-                tags = root.join("tags", JoinType.LEFT);
-                query.distinct(true);
-            }
 
-            if (filters.getMinOrders() != null || filters.getOrdersCountSort() != null) {
+            if (filters.getOrdersCountSort() != null
+                    || filters.getMinOrders() != null && filters.getMinOrders() > 0) {
                 orders = root.join("orders", JoinType.LEFT);
             }
 
-            // Билдим запрос
+            // Where
+            List<Predicate> whereStatements = new ArrayList<>();
             if (filters.getMasterId() != null) {
-                predicates.add(cb.equal(masterInfo.get("id"), filters.getMasterId()));
-            }
-            if (filters.getCategoryId() != null) {
-                predicates.add(cb.equal(root.get("category").get("id"), filters.getCategoryId()));
-            }
-            if (filters.getMinPrice() != null || filters.getMaxPrice() != null) {
-                predicates.add(
-                    cb.between(
-                        root.get("price"),
-                        filters.getMinPrice() != null ? filters.getMinPrice() : 0,
-                        filters.getMaxPrice() != null ? filters.getMaxPrice() : 999999
+                whereStatements.add(
+                    cb.equal(
+                        master.get("id"),
+                        filters.getMasterId()
                     )
                 );
             }
-            if (filters.getCityId() != null) {
-                predicates.add(cb.equal(city.get("id"), filters.getCityId()));
+            if (filters.getCategoryId() != null
+                    && filters.getCategoryId() > 0) {
+                whereStatements.add(
+                    cb.equal(
+                        category.get("id"),
+                        filters.getCategoryId()
+                    )
+                );
             }
-            if (filters.getExperience() != null) {
-                predicates.add(
+            if (filters.getExperience() != null
+                    && filters.getExperience() > 0) {
+                whereStatements.add(
                     cb.greaterThanOrEqualTo(
-                        masterInfo.get("experience"),
-                        filters.getExperience()
+                        master.get("experience"),
+                        (long) filters.getExperience()
+                    )
+                );
+            }
+            if (filters.getCityId() != null
+                && filters.getCityId() > 0) {
+                whereStatements.add(
+                    cb.equal(
+                        city.get("id"),
+                        filters.getCityId()
+                    )
+                );
+            }
+            if (filters.getMinPrice() != null || filters.getMaxPrice() != null) {
+                int min = filters.getMinPrice() != null
+                        ? filters.getMinPrice()
+                        : 0;
+                int max = filters.getMaxPrice() != null
+                        ? filters.getMaxPrice()
+                        : Integer.MAX_VALUE;
+
+                whereStatements.add(
+                    cb.between(
+                        root.get("price"),
+                        min,
+                        max
                     )
                 );
             }
             if (filters.getQuery() != null && !filters.getQuery().isBlank()) {
-                String likeQuery = "%" + filters.getQuery().toLowerCase() + "%";
-                predicates.add(
+                String q = "%" + filters.getQuery().toLowerCase() + "%";
+
+                whereStatements.add(
                     cb.or(
-                        cb.like(cb.lower(root.get("name")), likeQuery),
-                        cb.like(cb.lower(cb.coalesce(masterInfo.get("pseudonym"), "")), likeQuery)
+                        cb.like(
+                            cb.lower(root.get("name")),
+                            q
+                        ),
+                        cb.like(
+                            cb.lower(cb.coalesce(
+                                master.get("pseudonym"),
+                                ""
+                            )),
+                            q
+                        )
                     )
                 );
             }
+            if (filters.getTags() != null && filters.getTags().length > 0) {
+                Subquery<UUID> tagsSubquery = query.subquery(UUID.class);
+                Root<JobEntity> subroot = tagsSubquery.from(JobEntity.class);
+                Join<JobEntity, TagEntity> tagsJoin = subroot.join("tags");
+                tagsSubquery.select(subroot.get("id"))
+                        .where(
+                            tagsJoin.get("name").in(Arrays.asList(filters.getTags()))
+                        )
+                        .groupBy(subroot.get("id"))
+                        .having(cb.equal(
+                            cb.countDistinct(tagsJoin.get("name")),
+                            filters.getTags().length
+                        ));
 
-            // Группировка и having
-            boolean hasOrdersJoin = orders != null;
-            List<Predicate> havings = new ArrayList<>();
+                whereStatements.add(
+                    root.get("id").in(tagsSubquery)
+                );
+            }
+            if (filters.getSkills() != null && filters.getSkills().length > 0) {
+                Subquery<UUID> skillsSubquery = query.subquery(UUID.class);
+                Root<JobEntity> subroot = skillsSubquery.from(JobEntity.class);
+                Join<JobEntity, MasterInfoEntity> subrootMaster = subroot.join("masterInfo");
+                Join<MasterInfoEntity, SkillEntity> skillsJoin = subrootMaster.join("skills", JoinType.LEFT);
+                skillsSubquery.select(subroot.get("id"))
+                        .where(cb.and(skillsJoin.get("name").isNotNull(),
+                                skillsJoin.get("name")
+                                .in(Arrays.asList(filters.getTags())))
+                        )
+                        .groupBy(subroot.get("id"))
+                        .having(cb.equal(
+                                cb.countDistinct(skillsJoin.get("name")),
+                                filters.getSkills().length
+                        ));
 
-            if (hasTags || hasSkills || hasOrdersJoin) {
-                query.groupBy(root.get("id"));
+                whereStatements.add(
+                    root.get("id").in(skillsSubquery)
+                );
             }
 
-            if (hasTags) {
-                predicates.add(tags.get("name").in((Object[]) filters.getTags()));
-                havings.add(cb.equal(cb.countDistinct(tags.get("name")), filters.getTags().length));
-            }
-            if (hasSkills) {
-                predicates.add(skills.get("name").in((Object[]) filters.getSkills()));
-                havings.add(cb.equal(cb.countDistinct(skills.get("name")), filters.getSkills().length));
-            }
-            if (hasOrdersJoin) {
-                havings.add(cb.greaterThanOrEqualTo(cb.countDistinct(orders), filters.getMinOrders().longValue()));
-            }
-
-            if (!havings.isEmpty()) {
-                query.having(cb.and(havings.toArray(new Predicate[0])));
+            // Группировка
+            if (orders != null) {
+                query.groupBy(
+                    root.get("id"),
+                    root.get("price"),
+                    master.get("experience")
+                );
+                query.having(
+                    cb.greaterThanOrEqualTo(
+                        cb.countDistinct(
+                            orders.get("id")
+                        ),
+                        (long) filters.getMinOrders()
+                    )
+                );
             }
 
             // Сортировка
@@ -130,22 +188,34 @@ public class JobFilteringSpecification {
                         : cb.desc(root.get("price"))
                 );
             }
+            if (filters.getPriceSort() != null) {
+                sorts.add(
+                    filters.getPriceSort() == SortType.ASC
+                        ? cb.asc(root.get("price"))
+                        : cb.desc(root.get("price"))
+                );
+            }
             if (filters.getExperienceSort() != null) {
                 sorts.add(
                     filters.getExperienceSort() == SortType.ASC
-                        ? cb.asc(masterInfo.get("experience"))
-                        : cb.desc(masterInfo.get("experience"))
+                        ? cb.asc(master.get("experience"))
+                        : cb.desc(master.get("experience"))
                 );
             }
-            if (filters.getMinOrders() != null) {
+            if (filters.getOrdersCountSort() != null) {
+                Expression<Long> ordersCount = cb.countDistinct(orders.get("id"));
                 sorts.add(
                     filters.getOrdersCountSort() == SortType.ASC
-                        ? cb.asc(cb.countDistinct(orders))
-                        : cb.desc(cb.countDistinct(orders))
+                        ? cb.asc(ordersCount)
+                        : cb.desc(ordersCount)
                 );
             }
 
-            return cb.and(predicates.toArray(new Predicate[0]));
+            if (!sorts.isEmpty()) {
+                query.orderBy(sorts);
+            }
+
+            return cb.and(whereStatements.toArray(new Predicate[0]));
         };
     }
 }
