@@ -95,14 +95,15 @@ public class JobFilteringSpecification {
                 int max = filters.getMaxPrice() != null
                         ? filters.getMaxPrice()
                         : Integer.MAX_VALUE;
-
-                whereStatements.add(
-                    cb.between(
-                        root.get("price"),
-                        min,
-                        max
-                    )
-                );
+                if (min < max) {
+                    whereStatements.add(
+                            cb.between(
+                                    root.get("price"),
+                                    min,
+                                    max
+                            )
+                    );
+                }
             }
             if (filters.getQuery() != null && !filters.getQuery().isBlank()) {
                 String q = "%" + filters.getQuery().toLowerCase() + "%";
