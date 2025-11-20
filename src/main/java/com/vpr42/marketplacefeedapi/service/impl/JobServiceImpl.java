@@ -97,12 +97,16 @@ public class JobServiceImpl implements JobService {
         List<UUID> ids = jobIdsFiltered.stream()
                 .map(JobEntity::getId)
                 .toList();
-        List<JobEntityWithCount> jobs = jobRepository.findAllWithIdsIn(ids);
-        Map<UUID, Job> jobsWithKeys = jobs.stream()
-                .map(entity -> JobsMapper.fromEntity(entity.job(), entity.count()))
-                .collect(Collectors.toMap(Job::id, v -> v));
+
+        List<JobEntity> jobs = jobRepository.findAllEntitiesWithIds(ids);
+        Map<UUID, JobEntity> jobsById = jobs.stream()
+                .collect(Collectors.toMap(JobEntity::getId, v -> v));
+
+        List<JobEntityWithCount> jobCounts = jobRepository.findOrdersCountFor(ids);
+        Map<UUID, Long> jobsCount = jobCounts.stream()
+                .collect(Collectors.toMap(k -> k.job().getId(), JobEntityWithCount::count));
 
         return jobIdsFiltered
-                .map(el -> jobsWithKeys.get(el.getId()));
+                .map(el -> JobsMapper.fromEntity(jobsById.get(el.getId()), jobsCount.get(el.getId())));
     }
 }

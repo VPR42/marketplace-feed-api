@@ -1,16 +1,11 @@
 package com.vpr42.marketplacefeedapi.repository;
 
 import com.vpr42.marketplacefeedapi.model.dto.JobEntityWithCount;
-import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -34,5 +29,14 @@ public interface JobRepository extends JpaRepository<JobEntity, UUID>, JpaSpecif
             WHERE j.id IN :list
             GROUP BY j.id
         """)
-    List<JobEntityWithCount> findAllWithIdsIn(@Param("list") List<UUID> list);
+    List<JobEntityWithCount> findOrdersCountFor(@Param("list") List<UUID> list);
+
+    @Query(
+        """
+        FROM JobEntity j
+        WHERE j.id IN :list
+        """
+    )
+    @EntityGraph("JobEntity_withAdditionalInfo")
+    List<JobEntity> findAllEntitiesWithIds(@Param("list") List<UUID> list);
 }

@@ -10,6 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -38,8 +41,31 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"tags", "masterInfo", "category"})
-@EqualsAndHashCode(exclude = {"tags", "masterInfo", "category"})
+@ToString(exclude = {"tags", "masterInfo", "category", "orders"})
+@EqualsAndHashCode(exclude = {"tags", "masterInfo", "category", "orders"})
+@NamedEntityGraph(
+        name = "JobEntity_withAdditionalInfo",
+        attributeNodes = {
+                @NamedAttributeNode("category"),
+                @NamedAttributeNode("tags"),
+                @NamedAttributeNode(value = "masterInfo", subgraph = "subgraph.masterInfo")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "subgraph.masterInfo",
+                        attributeNodes = {
+                            @NamedAttributeNode("skills"),
+                            @NamedAttributeNode(value = "user", subgraph = "subgraph.user")
+                        }
+                ),
+                @NamedSubgraph(
+                    name = "subgraph.user",
+                    attributeNodes = {
+                        @NamedAttributeNode("city"),
+                    }
+                )
+        }
+)
 public class JobEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
