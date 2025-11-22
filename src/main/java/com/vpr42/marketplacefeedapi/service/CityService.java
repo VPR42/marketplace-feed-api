@@ -4,8 +4,8 @@ import org.springframework.data.domain.Page;
 
 public interface CityService {
     Page<City> getCities(String query,
-                         boolean withOrders,
-                         boolean orderedByOrdersCount,
+                         boolean withJobs,
+                         boolean orderedByJobsCount,
                          int page,
                          int pageSize);
 }

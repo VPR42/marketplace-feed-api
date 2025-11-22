@@ -27,7 +27,11 @@ public class TestServiceImpl implements TestService {
                 .name("TEST")
                 .password("TEST")
                 .email("test@mail.ru")
-                .city(new CityEntity(1, "Ростовская область", "Ростов-на-Дону"))
+                .city(CityEntity.builder()
+                        .id(1)
+                        .region("Ростовская область")
+                        .name("Ростов-на-Дону")
+                        .build())
                 .build();
 
         log.info("Test data was created: {}", user);

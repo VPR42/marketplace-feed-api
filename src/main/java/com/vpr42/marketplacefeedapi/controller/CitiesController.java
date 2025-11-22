@@ -18,16 +18,16 @@ public class CitiesController {
 
     @GetMapping
     public ResponseEntity<Page<City>> getCities(
-        @RequestParam(value = "withOrders", required = false, defaultValue = "false") boolean withOrders,
+        @RequestParam(value = "withJobs", required = false, defaultValue = "false") boolean withJobs,
         @RequestParam(value = "query", required = false) String query,
-        @RequestParam(value = "orderedByOrdersCount", required = false, defaultValue = "false") boolean orderedByOrdersCount,
+        @RequestParam(value = "orderedByJobsCount", required = false, defaultValue = "false") boolean orderedByJobsCount,
         @RequestParam(value = "page", required = false, defaultValue = "0") int page,
         @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize
     ) {
         return ResponseEntity
                 .ok(cityService.getCities(query,
-                        withOrders,
-                        orderedByOrdersCount,
+                        withJobs,
+                        orderedByJobsCount,
                         page,
                         pageSize));
     }
