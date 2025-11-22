@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -20,7 +21,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,8 +37,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@ToString(exclude = {"user", "skills"})
-@EqualsAndHashCode(exclude = {"user", "skills"})
+@ToString(exclude = {"user", "skills", "jobs"})
+@EqualsAndHashCode(exclude = {"user", "skills", "jobs"})
 public class MasterInfoEntity {
     @Id
     UUID id;
@@ -68,4 +71,8 @@ public class MasterInfoEntity {
     )
     @Builder.Default
     Set<SkillEntity> skills = new HashSet<>();
+
+    @OneToMany(mappedBy = "masterInfo", fetch = FetchType.LAZY)
+    @Builder.Default
+    List<JobEntity> jobs = new ArrayList<>();
 }
