@@ -33,9 +33,13 @@ public class CityFiltersSpecification {
                         cb.desc(cb.coalesce(cb.count(jobs), 0)),
                         cb.asc(concatTwo)
                     );
-                } else {
-                    query.orderBy(cb.asc(concatTwo));
                 }
+            }
+
+            if (!sortByJobsCount) {
+                query.orderBy(
+                    cb.asc(concatTwo)
+                );
             }
 
             if (searchQuery != null && !searchQuery.isBlank()) {
