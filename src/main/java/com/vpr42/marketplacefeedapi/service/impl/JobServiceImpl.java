@@ -131,19 +131,11 @@ public class JobServiceImpl implements JobService {
         log.info("Updating job with id: {} by user: {}", id, initiator.getId());
 
         JobEntity entity = jobRepository.findWithDetailsById(id)
-                .orElseThrow(() -> new ApplicationException(
-                        "Job not found with id: " + id,
-                        ApiError.INVALID_DATA,
-                        HttpStatus.NOT_FOUND
-                ));
+                .orElseThrow(() -> new JobNotFoundException(id));
 
         // При желании — проверка, что редактирует владелец услуги
-        if (!entity.getMasterInfo().getUser().getId().equals(initiator.getId())) {
-            throw new ApplicationException(
-                    "You are not allowed to edit this job",
-                    ApiError.INVALID_DATA,
-                    HttpStatus.FORBIDDEN
-            );
+        if (!entity.getMasterInfo().getId().equals(initiator.getId())) {
+            throw new JobEditForbiddenException(id, initiator.getId());
         }
 
         CategoryEntity categoryEntity = categoryRepository.findById(dto.categoryId())
