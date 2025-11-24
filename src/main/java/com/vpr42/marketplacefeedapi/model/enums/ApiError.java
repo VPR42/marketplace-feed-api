@@ -8,5 +8,6 @@ public enum ApiError {
     JOB_ALREADY_EXISTS,
     JOB_NOT_FOUND,
     SELF_FAVOURITE,
-    JOBS_NOT_FOUND
+    JOBS_NOT_FOUND,
+    FORBIDDEN
 }

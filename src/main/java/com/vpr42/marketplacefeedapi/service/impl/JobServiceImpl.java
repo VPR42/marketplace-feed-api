@@ -10,13 +10,11 @@ import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.model.enums.ApiError;
-import com.vpr42.marketplacefeedapi.model.exception.ApplicationException;
-import com.vpr42.marketplacefeedapi.model.exception.CategoryNotFoundException;
-import com.vpr42.marketplacefeedapi.model.exception.JobAlreadyExistsForUser;
-import com.vpr42.marketplacefeedapi.model.exception.JobsNotFoundException;
-import com.vpr42.marketplacefeedapi.model.exception.TagsNotFoundException;
+import com.vpr42.marketplacefeedapi.model.enums.OrderStatus;
+import com.vpr42.marketplacefeedapi.model.exception.*;
 import com.vpr42.marketplacefeedapi.repository.CategoryRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
+import com.vpr42.marketplacefeedapi.repository.OrderRepository;
 import com.vpr42.marketplacefeedapi.repository.TagsRepository;
 import com.vpr42.marketplacefeedapi.repository.criteria.JobFilteringSpecification;
 import com.vpr42.marketplacefeedapi.service.JobService;
@@ -45,6 +43,7 @@ public class JobServiceImpl implements JobService {
     private final JobRepository jobRepository;
     private final TagsRepository tagsRepository;
     private final CategoryRepository categoryRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     @Transactional
@@ -111,5 +110,59 @@ public class JobServiceImpl implements JobService {
 
         return jobIdsFiltered
                 .map(el -> JobsMapper.fromEntity(jobsById.get(el.getId()), jobsCount.get(el.getId())));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Job getJobById(UUID id) {
+        log.info("Fetching job by id: {}", id);
+
+        JobEntity entity = jobRepository.findWithDetailsById(id)
+                .orElseThrow(() -> new JobNotFoundException(id));
+
+        int orderCount = orderRepository.countByJobId(id);
+
+        return JobsMapper.fromEntity(entity, orderCount);
+    }
+
+    @Override
+    @Transactional
+    public Job updateJob(UUID id, CreateJobDto dto, UserEntity initiator) {
+        log.info("Updating job with id: {} by user: {}", id, initiator.getId());
+
+        JobEntity entity = jobRepository.findWithDetailsById(id)
+                .orElseThrow(() -> new JobNotFoundException(id));
+
+        // При желании — проверка, что редактирует владелец услуги
+        if (!entity.getMasterInfo().getId().equals(initiator.getId())) {
+            throw new JobEditForbiddenException(id, initiator.getId());
+        }
+
+        CategoryEntity categoryEntity = categoryRepository.findById(dto.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(dto.categoryId()));
+        log.info("Fetched category: {} for updateJob for user: {}", categoryEntity.getName(), initiator.getId());
+
+        Set<TagEntity> tags = tagsRepository.findByNameIn(dto.tags());
+        log.info("Fetched tags: {} for updateJob for user: {}", tags, initiator.getId());
+        if (tags.size() < dto.tags().size()) {
+            Set<String> presentedName = tags.stream()
+                    .map(TagEntity::getName)
+                    .collect(Collectors.toSet());
+            dto.tags().removeAll(presentedName);
+            log.info("Given tags are absent: {}", dto.tags());
+
+            throw new TagsNotFoundException(dto.tags());
+        }
+
+        entity.setName(dto.name());
+        entity.setDescription(dto.description());
+        entity.setPrice(dto.price());
+        entity.setCoverUrl(dto.coverUrl());
+        entity.setCategory(categoryEntity);
+        entity.setTags(tags);
+
+        int orderCount = orderRepository.countByJobId(id);
+
+        return JobsMapper.fromEntity(entity, orderCount);
     }
 }
