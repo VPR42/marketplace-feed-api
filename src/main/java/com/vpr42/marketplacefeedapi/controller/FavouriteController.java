@@ -1,11 +1,14 @@
 package com.vpr42.marketplacefeedapi.controller;
 
 import com.vpr42.marketplacefeedapi.model.dto.AddToFavouriteDto;
+import com.vpr42.marketplacefeedapi.model.dto.FavouriteFilters;
+import com.vpr42.marketplacefeedapi.model.dto.Job;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.service.FavouriteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,15 @@ public class FavouriteController {
         log.info("Adding job {} to favourites for user {}", dto.jobId(), user.getId());
         favouriteService.addToFavourite(dto, user);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<Job>> getFavouriteJobs(
+            @ModelAttribute @Valid FavouriteFilters filters,
+            @AuthenticationPrincipal UserEntity user) {
+        log.info("Fetching favourite jobs for user {}", user.getId());
+        Page<Job> favouriteJobs = favouriteService.getFavouriteJobs(filters, user);
+        return ResponseEntity.ok(favouriteJobs);
     }
 
     @DeleteMapping("/{jobId}")
