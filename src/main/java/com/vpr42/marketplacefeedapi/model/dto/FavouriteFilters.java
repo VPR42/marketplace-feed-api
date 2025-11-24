@@ -4,8 +4,6 @@ import com.vpr42.marketplacefeedapi.model.enums.SortType;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
 public class FavouriteFilters {
 
