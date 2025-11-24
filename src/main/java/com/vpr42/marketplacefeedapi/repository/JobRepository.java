@@ -31,6 +31,9 @@ public interface JobRepository extends JpaRepository<JobEntity, UUID>, JpaSpecif
         """)
     List<JobEntityWithCount> findOrdersCountFor(@Param("list") List<UUID> list);
 
+    @EntityGraph(value = "JobEntity_withAdditionalInfo", type = EntityGraph.EntityGraphType.LOAD)
+    Optional<JobEntity> findWithDetailsById(UUID id);
+
     @Query(
         """
         FROM JobEntity j
