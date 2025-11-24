@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RequestMapping("/api/feed/favourites")
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +24,14 @@ public class FavouriteController {
                                               @AuthenticationPrincipal UserEntity user) {
         log.info("Adding job {} to favourites for user {}", dto.jobId(), user.getId());
         favouriteService.addToFavourite(dto, user);
+        return ResponseEntity.ok().build();
+    }
 
+    @DeleteMapping("/{jobId}")
+    public ResponseEntity<Void> removeFromFavourite(@PathVariable UUID jobId,
+                                                    @AuthenticationPrincipal UserEntity user) {
+        log.info("Removing job {} from favourites for user {}", jobId, user.getId());
+        favouriteService.removeFromFavourite(jobId, user);
         return ResponseEntity.ok().build();
     }
 }
