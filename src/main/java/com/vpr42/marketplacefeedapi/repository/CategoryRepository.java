@@ -18,15 +18,14 @@ public class CategoryRepository {
     private EntityManager em;
 
     public List<CategoryEntityWithCount> findAllWithCount(String query,
-                                                          SortType ordersSort) {
+                                                          SortType jobsCountSort) {
         StringBuilder hql = new StringBuilder("""
             SELECT new com.vpr42.marketplacefeedapi.model.dto.CategoryEntityWithCount(
                 c,
-                COUNT(o)
+                COUNT(j)
             )
             FROM CategoryEntity c
             LEFT JOIN JobEntity j ON j.category = c
-            LEFT JOIN OrderEntity o ON o.job = j
         """);
 
         if (query != null && !query.isBlank()) {
@@ -35,8 +34,8 @@ public class CategoryRepository {
 
         hql.append(" GROUP BY c.id, c.name");
 
-        if (ordersSort != null) {
-            hql.append(" ORDER BY COUNT(o) ").append(ordersSort == SortType.ASC ? "ASC" : "DESC");
+        if (jobsCountSort != null) {
+            hql.append(" ORDER BY COUNT(j) ").append(jobsCountSort == SortType.ASC ? "ASC" : "DESC");
             hql.append(", c.id ASC");
         } else {
             hql.append(" ORDER BY c.id ASC");

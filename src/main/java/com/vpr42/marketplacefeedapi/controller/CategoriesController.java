@@ -23,10 +23,10 @@ public class CategoriesController {
     @GetMapping
     public ResponseEntity<List<CategoryWithCount>> getCategories(
         @RequestParam(value = "query", required = false) String query,
-        @RequestParam(value = "ordersCountSort", required = false) SortType ordersCountSort
+        @RequestParam(value = "jobsCountSort", required = false) SortType jobsCountSort
     ) {
         log.info("Processing get categories list request");
-        var categories = categoryService.getOrdered(query, ordersCountSort);
+        var categories = categoryService.getOrdered(query, jobsCountSort);
 
         return ResponseEntity.ok(categories);
     }
