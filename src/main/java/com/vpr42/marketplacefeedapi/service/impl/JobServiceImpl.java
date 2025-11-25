@@ -137,6 +137,10 @@ public class JobServiceImpl implements JobService {
             throw new JobEditForbiddenException(id, initiator.getId());
         }
 
+        if (jobRepository.findByMasterIdAndName(initiator.getId(), dto.name()).isPresent()) {
+            throw new JobAlreadyExistsForUser(dto.name());
+        }
+
         CategoryEntity categoryEntity = categoryRepository.findById(dto.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(dto.categoryId()));
         log.info("Fetched category: {} for updateJob for user: {}", categoryEntity.getName(), initiator.getId());
