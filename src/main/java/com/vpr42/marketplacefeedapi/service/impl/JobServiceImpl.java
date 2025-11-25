@@ -30,6 +30,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.vpr42.marketplacefeedapi.model.exception.AccessDeniedException;
 
 import java.util.List;
 import java.util.Map;
@@ -121,9 +122,9 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new JobsNotFoundException());
 
         // Проверка прав доступа - только владелец может удалять свою услугу
+        // Проверка прав доступа - только владелец может удалять свою услугу
         if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
-            throw new ApplicationException("You can only delete your own jobs",
-                    ApiError.ACCESS_DENIED, HttpStatus.FORBIDDEN);
+            throw new AccessDeniedException("You can only delete your own jobs");
         }
 
         try {
@@ -136,7 +137,7 @@ public class JobServiceImpl implements JobService {
 
         } catch (DataAccessException exception) {
             log.error("An error occurred deleting job with id: {} for user: {}", jobId, initiator.getId(), exception);
-            throw new ApplicationException("Failed to delete job", ApiError.DATABASE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApplicationException("Failed to delete job", ApiError.INVALID_DATA, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
