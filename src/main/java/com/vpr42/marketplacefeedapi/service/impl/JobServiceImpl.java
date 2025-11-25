@@ -10,7 +10,6 @@ import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.model.enums.ApiError;
-import com.vpr42.marketplacefeedapi.model.enums.OrderStatus;
 import com.vpr42.marketplacefeedapi.model.exception.*;
 import com.vpr42.marketplacefeedapi.repository.CategoryRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
