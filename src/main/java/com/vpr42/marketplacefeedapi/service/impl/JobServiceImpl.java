@@ -117,7 +117,7 @@ public class JobServiceImpl implements JobService {
     public void deleteJob(UUID jobId, UserEntity initiator) {
         // Проверка существования услуги
         JobEntity job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new JobsNotFoundException());
+                .orElseThrow(JobsNotFoundException::new);
 
         // Проверка прав доступа - только владелец может удалять свою услугу
         if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {

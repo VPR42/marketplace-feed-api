@@ -8,6 +8,7 @@ import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.service.JobService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +16,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,13 +23,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 import java.util.UUID;
 
@@ -43,16 +40,61 @@ public class JobController {
 
     @PostMapping
     @Operation(summary = "Создание услуги", responses = {
-        @ApiResponse(responseCode = "200", description = "Услуга создана",
+            @ApiResponse(responseCode = "200", description = "Услуга создана",
                 content = @Content(schema = @Schema(implementation = Job.class))),
-        @ApiResponse(responseCode = "400", description = "Ошибки валидации",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-        @ApiResponse(responseCode = "404", description = "Переданные Тэги/Категория не существуют",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-        @ApiResponse(responseCode = "409", description = "Услуга уже существует",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "Ошибки валидации",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                    @ExampleObject(
+                        name = "ValidationErrorResponse",
+                        summary = "Ошибки валидации",
+                        value = """
+                        {
+                            "status": 400,
+                            "errorCode": "INVALID_DATA",
+                            "message": "Invalid data",
+                            "errors": {
+                                "name": ["Job name can't be null"]
+                            }
+                        }
+                        """
+                    )
+                })),
+            @ApiResponse(responseCode = "404", description = "Переданные Тэги/Категория не существуют",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                        @ExampleObject(
+                                name = "TagsNotFound",
+                                summary = "Тэги/Категория не найдены",
+                                value = """
+                                {
+                                    "status": 404,
+                                    "errorCode": "TAGS_NOT_FOUND",
+                                    "message": "Given tags ['Tag1', 'Tag2'] are absent",
+                                    "errors": null
+                                }
+                                """
+                        )
+                }
+                )),
+            @ApiResponse(responseCode = "409", description = "Услуга уже существует",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                        @ExampleObject(
+                            name = "JobExists",
+                            summary = "Услуга для данного пользователя уже существует",
+                            value = """
+                            {
+                                "status": 409,
+                                "errorCode": "JOB_ALREADY_EXISTS",
+                                "message": "Job with name Работа already created by user",
+                                "errors": null
+                            }
+                            """
+                        )
+                }
+                ))
     })
-
     public ResponseEntity<Job> createJob(@RequestBody @Valid CreateJobDto dto,
                                          @AuthenticationPrincipal UserEntity user) {
         log.info("Processing new create job request from user: {}", user.getId());
@@ -63,10 +105,25 @@ public class JobController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Получение по Id", responses = {
-        @ApiResponse(responseCode = "200", description = "Услуга найдена",
+            @ApiResponse(responseCode = "200", description = "Услуга найдена",
                 content = @Content(schema = @Schema(implementation = Job.class))),
-        @ApiResponse(responseCode = "404", description = "Услуга не найдена",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+            @ApiResponse(responseCode = "404", description = "Услуга не найдена",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                    @ExampleObject(
+                        name = "TagsNotFound",
+                        summary = "Тэги/Категория не найдены",
+                        value = """
+                        {
+                            "status": 404,
+                            "errorCode": "JOB_NOT_FOUND",
+                            "message": "Job with id 000-00 is not found",
+                            "errors": null
+                        }
+                        """
+                    )
+                }
+                ))
     })
     public ResponseEntity<Job> getJobById(@PathVariable UUID id) {
         log.info("Processing get job request. jobId={}", id);
@@ -76,16 +133,78 @@ public class JobController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Обновление услуги", responses = {
-        @ApiResponse(responseCode = "200", description = "Услуга создана",
+            @ApiResponse(responseCode = "200", description = "Услуга создана",
                 content = @Content(schema = @Schema(implementation = Job.class))),
-        @ApiResponse(responseCode = "400", description = "Ошибки валидации",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-        @ApiResponse(responseCode = "403", description = "Ошибка доступа к услуге",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-        @ApiResponse(responseCode = "404", description = "Переданные Тэги/Категория/Услуга не существуют",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-        @ApiResponse(responseCode = "409", description = "Услуга уже существует",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "Ошибки валидации",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                    @ExampleObject(
+                        name = "ValidationErrorResponse",
+                        summary = "Ошибки валидации",
+                        value = """
+                        {
+                            "status": 400,
+                            "errorCode": "INVALID_DATA",
+                            "message": "Invalid data",
+                            "errors": {
+                                "name": ["Job name can't be null"]
+                            }
+                        }
+                        """
+                    )
+                }
+                )),
+            @ApiResponse(responseCode = "403", description = "Ошибка доступа к услуге",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                    @ExampleObject(
+                        name = "Forbidden",
+                        summary = "Доступ запрещен",
+                        value = """
+                        {
+                            "status": 403,
+                            "errorCode": "FORBIDDEN",
+                            "message": "Forbidden message",
+                            "errors": null
+                        }
+                        """
+                    )
+                }
+                )),
+            @ApiResponse(responseCode = "404", description = "Переданные Тэги/Категория/Услуга не существуют",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                        @ExampleObject(
+                            name = "TagsNotFound",
+                            summary = "Тэги/Категория не найдены",
+                            value = """
+                            {
+                                "status": 404,
+                                "errorCode": "TAGS_NOT_FOUND",
+                                "message": "Given tags ['Tag1', 'Tag2'] are absent",
+                                "errors": null
+                            }
+                            """
+                        )
+                }
+            )),
+            @ApiResponse(responseCode = "409", description = "Услуга уже существует",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                    @ExampleObject(
+                            name = "JobExists",
+                            summary = "Услуга для данного пользователя уже существует",
+                            value = """
+                            {
+                                "status": 409,
+                                "errorCode": "JOB_ALREADY_EXISTS",
+                                "message": "Job with name Работа already created by user",
+                                "errors": null
+                            }
+                            """
+                    )
+                }
+            ))
     })
     public ResponseEntity<Job> updateJob(@PathVariable UUID id,
                                          @RequestBody @Valid CreateJobDto dto,
@@ -97,20 +216,70 @@ public class JobController {
 
     @GetMapping
     @Operation(summary = "Получение услуг с фильтрами", responses = {
-        @ApiResponse(responseCode = "200", description = "Услуги найдены",
+            @ApiResponse(responseCode = "200", description = "Услуги найдены",
                 content = @Content(schema = @Schema(implementation = Job.class))),
-        @ApiResponse(responseCode = "404", description = "Услуги не найдены",
-                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+            @ApiResponse(responseCode = "404", description = "Услуги не найдены",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                    @ExampleObject(
+                        name = "JobsNotFound",
+                        summary = "Услуги не найдены",
+                        value = """
+                        {
+                            "status": 404,
+                            "errorCode": "JOBS_NOT_FOUND",
+                            "message": "Jobs with given filters are not found",
+                            "errors": null
+                        }
+                        """
+                    )
+                }
+                ))
     })
     public ResponseEntity<Page<Job>> getJobs(
-            @ModelAttribute @Valid JobFilters filters,
-            @AuthenticationPrincipal UserEntity user
+        @ModelAttribute @Valid JobFilters filters
     ) {
         return ResponseEntity
                 .ok(jobService.getJobsFiltered(filters));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Удаление услуги", responses = {
+            @ApiResponse(responseCode = "200", description = "Услуга удалена"),
+            @ApiResponse(responseCode = "403", description = "Ошибки доступа",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                    examples = {
+                        @ExampleObject(
+                            name = "Forbidden",
+                            summary = "Доступ запрещен",
+                            value = """
+                            {
+                                "status": 403,
+                                "errorCode": "FORBIDDEN",
+                                "message": "Forbidden message",
+                                "errors": null
+                            }
+                            """
+                        )
+                    })),
+            @ApiResponse(responseCode = "404", description = "Услуга не найдена",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                        examples = {
+                            @ExampleObject(
+                                name = "TagsNotFound",
+                                summary = "Тэги/Категория не найдены",
+                                value = """
+                                {
+                                    "status": 404,
+                                    "errorCode": "JOB_NOT_FOUND",
+                                    "message": "Job with id 000-00 is not found",
+                                    "errors": null
+                                }
+                                """
+                            )
+                        }
+                    )),
+    })
     public ResponseEntity<Void> deleteJob(@PathVariable UUID id,
                                           @AuthenticationPrincipal UserEntity currentUser) {
         log.info("Processing delete job request for job id: {} from user: {}", id, currentUser.getId());
