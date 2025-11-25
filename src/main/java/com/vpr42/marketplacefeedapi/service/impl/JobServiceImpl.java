@@ -118,10 +118,10 @@ public class JobServiceImpl implements JobService {
     public void deleteJob(UUID jobId, UserEntity initiator) {
         // Проверка существования услуги
         JobEntity job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new JobsNotFoundException("Job not found with id: " + jobId));
+                .orElseThrow(() -> new JobsNotFoundException());
 
         // Проверка прав доступа - только владелец может удалять свою услугу
-        if (!job.getMasterInfo().getMaster().getId().equals(initiator.getId())) {
+        if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
             throw new ApplicationException("You can only delete your own jobs",
                     ApiError.ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
