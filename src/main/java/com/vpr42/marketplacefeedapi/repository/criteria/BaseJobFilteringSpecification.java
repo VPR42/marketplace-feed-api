@@ -1,6 +1,7 @@
 package com.vpr42.marketplacefeedapi.repository.criteria;
 
 import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
+import com.vpr42.marketplacefeedapi.model.entity.FavouriteJobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.MasterInfoEntity;
 import com.vpr42.marketplacefeedapi.model.entity.OrderEntity;
@@ -11,6 +12,7 @@ import jakarta.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class BaseJobFilteringSpecification {
 
@@ -28,6 +30,7 @@ public abstract class BaseJobFilteringSpecification {
             SortType ordersCountSort,
             SortType createdAtSort,
             Integer minOrders) {
+
         // Join-ы
         Join<JobEntity, MasterInfoEntity> master = root.join("masterInfo");
         Join<JobEntity, CategoryEntity> category = null;
@@ -96,7 +99,6 @@ public abstract class BaseJobFilteringSpecification {
             Subquery<Object> skillsSubquery = createSkillsSubquery(root, query, cb, skills);
             whereStatements.add(root.get("id").in(skillsSubquery));
         }
-
         // Группировка для подсчета заказов
         if (orders != null && minOrders != null && minOrders > 0) {
             query.groupBy(root.get("id"), root.get("price"));
@@ -107,12 +109,48 @@ public abstract class BaseJobFilteringSpecification {
                     )
             );
         }
-
         // Сортировка
         applySorting(root, query, cb, orders, priceSort, ordersCountSort, createdAtSort);
 
         if (!whereStatements.isEmpty()) {
             query.where(cb.and(whereStatements.toArray(new Predicate[0])));
+        }
+    }
+
+    protected static void applyFavouriteCondition(
+            Root<JobEntity> root,
+            CriteriaQuery<?> query,
+            CriteriaBuilder cb,
+            UUID userId) {
+        Subquery<UUID> favouriteSubquery = query.subquery(UUID.class);
+        Root<FavouriteJobEntity> favouriteRoot = favouriteSubquery.from(FavouriteJobEntity.class);
+        favouriteSubquery.select(favouriteRoot.get("service").get("id"))
+                .where(cb.equal(favouriteRoot.get("user").get("id"), userId));
+
+        Predicate existingRestriction = query.getRestriction();
+        Predicate favouritePredicate = root.get("id").in(favouriteSubquery);
+
+        if (existingRestriction != null) {
+            query.where(cb.and(existingRestriction, favouritePredicate));
+        } else {
+            query.where(favouritePredicate);
+        }
+    }
+
+    protected static void applyFavouriteDefaultSorting(
+            Root<JobEntity> root,
+            CriteriaQuery<?> query,
+            CriteriaBuilder cb,
+            UUID userId) {
+        if (query.getOrderList() == null || query.getOrderList().isEmpty()) {
+            Subquery<java.time.Instant> favouriteDateSubquery = query.subquery(java.time.Instant.class);
+            Root<FavouriteJobEntity> favouriteDateRoot = favouriteDateSubquery.from(FavouriteJobEntity.class);
+            favouriteDateSubquery.select(favouriteDateRoot.get("createdAt"))
+                    .where(cb.and(
+                            cb.equal(favouriteDateRoot.get("user").get("id"), userId),
+                            cb.equal(favouriteDateRoot.get("service").get("id"), root.get("id"))
+                    ));
+            query.orderBy(cb.desc(favouriteDateSubquery));
         }
     }
 

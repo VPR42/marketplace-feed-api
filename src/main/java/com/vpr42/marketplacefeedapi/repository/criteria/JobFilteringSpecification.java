@@ -64,6 +64,7 @@ public class JobFilteringSpecification extends BaseJobFilteringSpecification {
                     null,
                     filters.getMinOrders()
             );
+
             applyJobSpecificSorting(root, query, cb, master, orders, filters);
 
             if (!whereStatements.isEmpty()) {
@@ -82,6 +83,7 @@ public class JobFilteringSpecification extends BaseJobFilteringSpecification {
             Join<JobEntity, MasterInfoEntity> master,
             Join<JobEntity, OrderEntity> orders,
             JobFilters filters) {
+
         List<Order> sorts = new ArrayList<>();
 
         if (filters.getExperienceSort() != null) {
@@ -91,7 +93,6 @@ public class JobFilteringSpecification extends BaseJobFilteringSpecification {
                             : cb.desc(master.get("experience"))
             );
         }
-
         if (!sorts.isEmpty()) {
             List<Order> existingOrders = query.getOrderList();
             if (existingOrders != null) {
