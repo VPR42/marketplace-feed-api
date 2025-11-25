@@ -38,7 +38,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
     // Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
+    implementation("org.apache.commons:commons-lang3:3.18.0")
 
     // Logging
     runtimeOnly("io.github.oshai:kotlin-logging-jvm:7.0.7")

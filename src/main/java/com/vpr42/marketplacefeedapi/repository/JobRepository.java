@@ -42,6 +42,4 @@ public interface JobRepository extends JpaRepository<JobEntity, UUID>, JpaSpecif
     )
     @EntityGraph("JobEntity_withAdditionalInfo")
     List<JobEntity> findAllEntitiesWithIds(@Param("list") List<UUID> list);
-
-    boolean existsByIdAndMasterInfo_User_Id(UUID jobId, UUID userId);
 }

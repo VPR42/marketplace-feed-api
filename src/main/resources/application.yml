@@ -19,5 +19,12 @@ spring:
   datasource:
     driver-class: org.postgresql.Driver
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    csrf:
+      enabled: true
+
 server:
   port: 33303

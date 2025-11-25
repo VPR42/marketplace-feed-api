@@ -9,8 +9,13 @@ import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
-import com.vpr42.marketplacefeedapi.model.enums.ApiError;
-import com.vpr42.marketplacefeedapi.model.exception.*;
+import com.vpr42.marketplacefeedapi.model.exception.AccessDeniedException;
+import com.vpr42.marketplacefeedapi.model.exception.CategoryNotFoundException;
+import com.vpr42.marketplacefeedapi.model.exception.JobAlreadyExistsForUser;
+import com.vpr42.marketplacefeedapi.model.exception.JobEditForbiddenException;
+import com.vpr42.marketplacefeedapi.model.exception.JobNotFoundException;
+import com.vpr42.marketplacefeedapi.model.exception.JobsNotFoundException;
+import com.vpr42.marketplacefeedapi.model.exception.TagsNotFoundException;
 import com.vpr42.marketplacefeedapi.repository.CategoryRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
 import com.vpr42.marketplacefeedapi.repository.OrderRepository;
@@ -19,15 +24,12 @@ import com.vpr42.marketplacefeedapi.repository.criteria.JobFilteringSpecificatio
 import com.vpr42.marketplacefeedapi.service.JobService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.vpr42.marketplacefeedapi.model.exception.AccessDeniedException;
 
 import java.util.List;
 import java.util.Map;
@@ -70,16 +72,10 @@ public class JobServiceImpl implements JobService {
             throw new TagsNotFoundException(dto.tags());
         }
 
-        try {
-            JobEntity entity = JobsMapper.toEntity(dto, tags, categoryEntity, initiator);
-            JobEntity createdService = jobRepository.save(entity);
+        JobEntity entity = JobsMapper.toEntity(dto, tags, categoryEntity, initiator);
+        JobEntity createdService = jobRepository.save(entity);
 
-            return JobsMapper.fromEntity(createdService, 0);
-        } catch (DataAccessException exception) {
-            log.error("An error occurred creating new service for user with id: {}", initiator.getId(), exception);
-
-            throw new ApplicationException("Failed to create new service", ApiError.INVALID_DATA, HttpStatus.BAD_REQUEST);
-        }
+        return JobsMapper.fromEntity(createdService, 0);
     }
 
     @Override
@@ -117,7 +113,7 @@ public class JobServiceImpl implements JobService {
     public void deleteJob(UUID jobId, UserEntity initiator) {
         // Проверка существования услуги
         JobEntity job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new JobsNotFoundException());
+                .orElseThrow(JobsNotFoundException::new);
 
         // Проверка прав доступа - только владелец может удалять свою услугу
         if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
@@ -153,6 +149,10 @@ public class JobServiceImpl implements JobService {
         // При желании — проверка, что редактирует владелец услуги
         if (!entity.getMasterInfo().getId().equals(initiator.getId())) {
             throw new JobEditForbiddenException(id, initiator.getId());
+        }
+
+        if (jobRepository.findByMasterIdAndName(initiator.getId(), dto.name()).isPresent()) {
+            throw new JobAlreadyExistsForUser(dto.name());
         }
 
         CategoryEntity categoryEntity = categoryRepository.findById(dto.categoryId())
