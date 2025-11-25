@@ -4,7 +4,6 @@ import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
 import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.MasterInfoEntity;
-import com.vpr42.marketplacefeedapi.model.entity.OrderEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.model.enums.SortType;
 import jakarta.persistence.criteria.*;
@@ -19,19 +18,14 @@ public class JobFilteringSpecification extends BaseJobFilteringSpecification {
         return (root, query, cb) -> {
             query.select(root.get("id"));
 
-            // Join-ы
+            // Join-ы специфичные для JobFilters
             Join<JobEntity, MasterInfoEntity> master = root.join("masterInfo");
             Join<MasterInfoEntity, UserEntity> user = null;
             Join<UserEntity, CityEntity> city = null;
-            Join<JobEntity, OrderEntity> orders = null;
 
             if (filters.getCityId() != null && filters.getCityId() > 0) {
                 user = master.join("user");
                 city = user.join("city");
-            }
-            if (filters.getOrdersCountSort() != null
-                    || filters.getMinOrders() != null && filters.getMinOrders() > 0) {
-                orders = root.join("orders", JoinType.LEFT);
             }
 
             List<Predicate> whereStatements = new ArrayList<>();
@@ -65,7 +59,7 @@ public class JobFilteringSpecification extends BaseJobFilteringSpecification {
                     filters.getMinOrders()
             );
 
-            applyJobSpecificSorting(root, query, cb, master, orders, filters);
+            applyJobSpecificSorting(root, query, cb, master, filters);
 
             if (!whereStatements.isEmpty()) {
                 Predicate commonPredicate = query.getRestriction();
@@ -81,7 +75,6 @@ public class JobFilteringSpecification extends BaseJobFilteringSpecification {
             CriteriaQuery<?> query,
             CriteriaBuilder cb,
             Join<JobEntity, MasterInfoEntity> master,
-            Join<JobEntity, OrderEntity> orders,
             JobFilters filters) {
 
         List<Order> sorts = new ArrayList<>();
@@ -93,6 +86,7 @@ public class JobFilteringSpecification extends BaseJobFilteringSpecification {
                             : cb.desc(master.get("experience"))
             );
         }
+
         if (!sorts.isEmpty()) {
             List<Order> existingOrders = query.getOrderList();
             if (existingOrders != null) {

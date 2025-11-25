@@ -99,18 +99,23 @@ public abstract class BaseJobFilteringSpecification {
             Subquery<Object> skillsSubquery = createSkillsSubquery(root, query, cb, skills);
             whereStatements.add(root.get("id").in(skillsSubquery));
         }
-        // Группировка для подсчета заказов
+
         if (orders != null && minOrders != null && minOrders > 0) {
-            query.groupBy(root.get("id"), root.get("price"));
-            query.having(
-                    cb.greaterThanOrEqualTo(
-                            cb.countDistinct(orders.get("id")),
+            Subquery<UUID> ordersSubquery = query.subquery(UUID.class);
+            Root<JobEntity> ordersSubroot = ordersSubquery.from(JobEntity.class);
+            Join<JobEntity, OrderEntity> ordersJoin = ordersSubroot.join("orders", JoinType.LEFT);
+
+            ordersSubquery.select(ordersSubroot.get("id"))
+                    .groupBy(ordersSubroot.get("id"))
+                    .having(cb.greaterThanOrEqualTo(
+                            cb.countDistinct(ordersJoin.get("id")),
                             (long) minOrders
-                    )
-            );
+                    ));
+
+            whereStatements.add(root.get("id").in(ordersSubquery));
         }
-        // Сортировка
-        applySorting(root, query, cb, orders, priceSort, ordersCountSort, createdAtSort);
+
+        applySorting(root, query, cb, orders, priceSort, ordersCountSort, createdAtSort, minOrders);
 
         if (!whereStatements.isEmpty()) {
             query.where(cb.and(whereStatements.toArray(new Predicate[0])));
@@ -145,6 +150,7 @@ public abstract class BaseJobFilteringSpecification {
         if (query.getOrderList() == null || query.getOrderList().isEmpty()) {
             Subquery<java.time.Instant> favouriteDateSubquery = query.subquery(java.time.Instant.class);
             Root<FavouriteJobEntity> favouriteDateRoot = favouriteDateSubquery.from(FavouriteJobEntity.class);
+
             favouriteDateSubquery.select(favouriteDateRoot.get("createdAt"))
                     .where(cb.and(
                             cb.equal(favouriteDateRoot.get("user").get("id"), userId),
@@ -178,6 +184,7 @@ public abstract class BaseJobFilteringSpecification {
             CriteriaQuery<?> query,
             CriteriaBuilder cb,
             String[] skills) {
+
         Subquery<Object> skillsSubquery = query.subquery(Object.class);
         Root<JobEntity> subroot = skillsSubquery.from(JobEntity.class);
         Join<JobEntity, MasterInfoEntity> subrootMaster = subroot.join("masterInfo");
@@ -203,7 +210,9 @@ public abstract class BaseJobFilteringSpecification {
             Join<JobEntity, OrderEntity> orders,
             SortType priceSort,
             SortType ordersCountSort,
-            SortType createdAtSort) {
+            SortType createdAtSort,
+            Integer minOrders) {
+
         List<Order> sorts = new ArrayList<>();
 
         // Сортировка по цене
@@ -214,9 +223,17 @@ public abstract class BaseJobFilteringSpecification {
                             : cb.desc(root.get("price"))
             );
         }
+
         // Сортировка по количеству заказов
         if (ordersCountSort != null && orders != null) {
-            Expression<Long> ordersCount = cb.countDistinct(orders.get("id"));
+            Subquery<Long> ordersCountSubquery = query.subquery(Long.class);
+            Root<JobEntity> ordersCountRoot = ordersCountSubquery.from(JobEntity.class);
+            Join<JobEntity, OrderEntity> ordersCountJoin = ordersCountRoot.join("orders", JoinType.LEFT);
+
+            ordersCountSubquery.select(cb.countDistinct(ordersCountJoin.get("id")))
+                    .where(cb.equal(ordersCountRoot.get("id"), root.get("id")));
+
+            Expression<Long> ordersCount = ordersCountSubquery;
             sorts.add(
                     ordersCountSort == SortType.ASC
                             ? cb.asc(ordersCount)
