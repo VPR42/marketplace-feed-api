@@ -4,6 +4,7 @@ import com.vpr42.marketplacefeedapi.model.dto.ApiErrorResponse;
 import com.vpr42.marketplacefeedapi.model.enums.ApiError;
 import com.vpr42.marketplacefeedapi.model.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -56,12 +57,23 @@ public class ExceptionHandlingControllerAdvice {
     }
 
     /**
-     * Сюда будем добавлять разные виды исключений и их обработку
-     * Handler пишется по такому принципу
+     * Обработка ошибок при работе с БД
+     */
+    @ExceptionHandler
+    public ResponseEntity<?> handleDataAccess(DataAccessException ex) {
+        log.error("Fatal error occurred database interaction", ex);
+
+        return ResponseEntity
+                .internalServerError()
+                .build();
+    }
+
+    /**
+     * Все оставшиеся ошибки
      */
     @ExceptionHandler
     public ResponseEntity<?> handleException(Exception ex) {
-        log.error("An error occurred processing request", ex);
+        log.error("Fatal error while processing request", ex);
 
         return ResponseEntity
                 .internalServerError()
