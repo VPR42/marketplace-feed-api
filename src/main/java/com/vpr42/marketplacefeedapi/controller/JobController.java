@@ -9,11 +9,21 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 import java.util.UUID;
 
@@ -26,7 +36,7 @@ public class JobController {
 
     @PostMapping
     public ResponseEntity<Job> createJob(@RequestBody @Valid CreateJobDto dto,
-                                       @AuthenticationPrincipal UserEntity user) {
+                                         @AuthenticationPrincipal UserEntity user) {
         log.info("Processing new create job request from user: {}", user.getId());
         Job result = jobService.createJob(dto, user);
 
@@ -51,10 +61,19 @@ public class JobController {
 
     @GetMapping
     public ResponseEntity<Page<Job>> getJobs(
-        @ModelAttribute @Valid JobFilters filters,
-        @AuthenticationPrincipal UserEntity user
+            @ModelAttribute @Valid JobFilters filters,
+            @AuthenticationPrincipal UserEntity user
     ) {
         return ResponseEntity
                 .ok(jobService.getJobsFiltered(filters));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteJob(@PathVariable UUID id,
+                                          @AuthenticationPrincipal UserEntity currentUser) {
+        log.info("Processing delete job request for job id: {} from user: {}", id, currentUser.getId());
+        jobService.deleteJob(id, currentUser);
+
+        return ResponseEntity.ok().build();
     }
 }

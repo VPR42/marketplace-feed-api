@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.vpr42.marketplacefeedapi.model.exception.AccessDeniedException;
 
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,23 @@ public class JobServiceImpl implements JobService {
 
         return jobIdsFiltered
                 .map(el -> JobsMapper.fromEntity(jobsById.get(el.getId()), jobsCount.get(el.getId())));
+    }
+
+    @Override
+    @Transactional
+    public void deleteJob(UUID jobId, UserEntity initiator) {
+        // Проверка существования услуги
+        JobEntity job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new JobsNotFoundException());
+
+        // Проверка прав доступа - только владелец может удалять свою услугу
+        if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
+            throw new AccessDeniedException("You can only delete your own jobs");
+        }
+
+        // Удаление основной сущности
+        jobRepository.delete(job);
+        log.info("Job with id: {} successfully deleted by user: {}", jobId, initiator.getId());
     }
 
     @Override
