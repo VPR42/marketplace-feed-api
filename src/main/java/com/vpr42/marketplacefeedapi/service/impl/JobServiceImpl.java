@@ -121,7 +121,7 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new JobsNotFoundException("Job not found with id: " + jobId));
 
         // Проверка прав доступа - только владелец может удалять свою услугу
-        if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
+        if (!job.getMasterInfo().getMaster().getId().equals(initiator.getId())) {
             throw new ApplicationException("You can only delete your own jobs",
                     ApiError.ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
