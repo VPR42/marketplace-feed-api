@@ -7,7 +7,7 @@ public class AccessDeniedException extends ApplicationException {
     public AccessDeniedException(String message) {
         super(
                 message,
-                ApiError.ACCESS_DENIED,
+                ApiError.FORBIDDEN,
                 HttpStatus.FORBIDDEN
         );
     }
@@ -15,7 +15,7 @@ public class AccessDeniedException extends ApplicationException {
     public AccessDeniedException() {
         super(
                 "Access denied",
-                ApiError.ACCESS_DENIED,
+                ApiError.FORBIDDEN,
                 HttpStatus.FORBIDDEN
         );
     }
