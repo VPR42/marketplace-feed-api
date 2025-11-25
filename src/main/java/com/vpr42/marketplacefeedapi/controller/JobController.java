@@ -50,10 +50,11 @@ public class JobController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable UUID id,
-                          @AuthenticationPrincipal UserEntity currentUser) {
+    public ResponseEntity<Void> deleteJob(@PathVariable UUID id,
+                                          @AuthenticationPrincipal UserEntity currentUser) {
         log.info("Processing delete job request for job id: {} from user: {}", id, currentUser.getId());
         jobService.deleteJob(id, currentUser);
+
+        return ResponseEntity.ok().build();
     }
 }
