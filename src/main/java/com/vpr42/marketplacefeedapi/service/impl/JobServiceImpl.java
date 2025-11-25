@@ -112,4 +112,31 @@ public class JobServiceImpl implements JobService {
         return jobIdsFiltered
                 .map(el -> JobsMapper.fromEntity(jobsById.get(el.getId()), jobsCount.get(el.getId())));
     }
+
+    @Override
+    @Transactional
+    public void deleteJob(UUID jobId, UserEntity initiator) {
+        // Проверка существования услуги
+        JobEntity job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new JobsNotFoundException("Job not found with id: " + jobId));
+
+        // Проверка прав доступа - только владелец может удалять свою услугу
+        if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
+            throw new ApplicationException("You can only delete your own jobs",
+                    ApiError.ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+
+        try {
+
+            job.getTags().clear(); // Очищаем связи с тегами перед удалением
+
+            // Удаление основной сущности
+            jobRepository.delete(job);
+            log.info("Job with id: {} successfully deleted by user: {}", jobId, initiator.getId());
+
+        } catch (DataAccessException exception) {
+            log.error("An error occurred deleting job with id: {} for user: {}", jobId, initiator.getId(), exception);
+            throw new ApplicationException("Failed to delete job", ApiError.DATABASE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
