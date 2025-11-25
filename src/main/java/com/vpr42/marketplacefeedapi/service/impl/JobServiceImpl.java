@@ -127,6 +127,9 @@ public class JobServiceImpl implements JobService {
         // Удаление основной сущности
         jobRepository.delete(job);
         log.info("Job with id: {} successfully deleted by user: {}", jobId, initiator.getId());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Job getJobById(UUID id) {
         log.info("Fetching job by id: {}", id);
