@@ -21,7 +21,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public List<CategoryWithCount> getOrdered(String query, SortType sortByJobsCount) {
-        log.info("Count is: {}", categoryRepository.count());
         List<CategoryWithCount> categories = categoryRepository.findAllWithCount(query, sortByJobsCount)
                 .stream()
                 .map(category -> new CategoryWithCount(
