@@ -23,7 +23,7 @@ public class CitiesController {
 
     @GetMapping
     @Operation(summary = "Получение списка городов с фильтрами", responses = {
-        @ApiResponse(responseCode = "200")
+        @ApiResponse(responseCode = "200", description = "Даже при отсутствии городов возвращает 200, проверяется через empty")
     })
     public ResponseEntity<Page<City>> getCities(
         @Parameter(description = "Запрашивать с услугами")

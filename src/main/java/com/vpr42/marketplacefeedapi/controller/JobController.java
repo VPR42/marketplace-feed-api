@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -216,8 +217,7 @@ public class JobController {
 
     @GetMapping
     @Operation(summary = "Получение услуг с фильтрами", responses = {
-            @ApiResponse(responseCode = "200", description = "Услуги найдены",
-                content = @Content(schema = @Schema(implementation = Job.class))),
+            @ApiResponse(responseCode = "200", description = "Услуги найдены"),
             @ApiResponse(responseCode = "404", description = "Услуги не найдены",
                 content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
                 examples = {
