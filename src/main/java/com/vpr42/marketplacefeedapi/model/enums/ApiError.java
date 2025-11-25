@@ -10,4 +10,5 @@ public enum ApiError {
     SELF_FAVOURITE,
     JOBS_NOT_FOUND,
     ACCESS_DENIED
+    FORBIDDEN
 }

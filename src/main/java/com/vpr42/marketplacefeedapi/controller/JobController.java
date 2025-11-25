@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 import java.util.UUID;
 
@@ -37,6 +40,22 @@ public class JobController {
         log.info("Processing new create job request from user: {}", user.getId());
         Job result = jobService.createJob(dto, user);
 
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Job> getJobById(@PathVariable UUID id) {
+        log.info("Processing get job request. jobId={}", id);
+        Job result = jobService.getJobById(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Job> updateJob(@PathVariable UUID id,
+                                         @RequestBody @Valid CreateJobDto dto,
+                                         @AuthenticationPrincipal UserEntity user) {
+        log.info("Processing update job request. jobId={}, userId={}", id, user.getId());
+        Job result = jobService.updateJob(id, dto, user);
         return ResponseEntity.ok(result);
     }
 

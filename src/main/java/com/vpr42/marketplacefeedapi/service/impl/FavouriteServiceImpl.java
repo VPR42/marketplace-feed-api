@@ -56,6 +56,14 @@ public class FavouriteServiceImpl implements FavouriteService {
 
     @Override
     @Transactional
+    public void removeFromFavourite(UUID jobId, UserEntity user) {
+        FavouriteKey key = new FavouriteKey(user.getId(), jobId);
+        favouriteJobRepository.deleteById(key);
+        log.info("Job {} removed from favourites for user {}", jobId, user.getId());
+    }
+
+    @Override
+    @Transactional
     public boolean isJobInFavourite(UUID jobId, UserEntity user) {
         FavouriteKey key = new FavouriteKey(user.getId(), jobId);
 

@@ -7,8 +7,14 @@ import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import java.util.UUID;
 
+import java.util.UUID;
+
 public interface JobService {
     Job createJob(CreateJobDto dto, UserEntity initiator);
     Page<Job> getJobsFiltered(JobFilters filters);
     void deleteJob(UUID jobId, UserEntity initiator);
+
+    Job getJobById(UUID id);
+
+    Job updateJob(UUID id, CreateJobDto dto, UserEntity initiator);
 }
