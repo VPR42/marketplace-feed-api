@@ -122,22 +122,12 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new JobsNotFoundException());
 
         // Проверка прав доступа - только владелец может удалять свою услугу
-        // Проверка прав доступа - только владелец может удалять свою услугу
         if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
             throw new AccessDeniedException("You can only delete your own jobs");
         }
 
-        try {
-
-            job.getTags().clear(); // Очищаем связи с тегами перед удалением
-
-            // Удаление основной сущности
-            jobRepository.delete(job);
-            log.info("Job with id: {} successfully deleted by user: {}", jobId, initiator.getId());
-
-        } catch (DataAccessException exception) {
-            log.error("An error occurred deleting job with id: {} for user: {}", jobId, initiator.getId(), exception);
-            throw new ApplicationException("Failed to delete job", ApiError.INVALID_DATA, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        // Удаление основной сущности
+        jobRepository.delete(job);
+        log.info("Job with id: {} successfully deleted by user: {}", jobId, initiator.getId());
     }
 }
