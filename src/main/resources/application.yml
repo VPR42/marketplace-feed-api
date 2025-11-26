@@ -19,6 +19,13 @@ spring:
   datasource:
     driver-class: org.postgresql.Driver
 
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://marketplace-eureka:33307/eureka
+
 springdoc:
   api-docs:
     enabled: true
