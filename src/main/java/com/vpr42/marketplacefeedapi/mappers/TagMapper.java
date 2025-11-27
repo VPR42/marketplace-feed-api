@@ -6,19 +6,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 public class TagMapper {
 
-    public TagDto fromEntity(TagEntity entity) {
+    public static TagDto fromEntity(TagEntity entity) {
         return new TagDto(
                 entity.getId(),
                 entity.getName()
         );
     }
 
-    public List<TagDto> fromEntities(List<TagEntity> entities) {
+    public static List<TagDto> fromEntities(List<TagEntity> entities) {
         return entities.stream()
-                .map(this::fromEntity)
+                .map(TagMapper::fromEntity)
                 .toList();
     }
 }

@@ -1,9 +1,6 @@
 package com.vpr42.marketplacefeedapi.controller;
 
-import com.vpr42.marketplacefeedapi.model.dto.ApiErrorResponse;
-import com.vpr42.marketplacefeedapi.model.dto.CreateJobDto;
-import com.vpr42.marketplacefeedapi.model.dto.Job;
-import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
+import com.vpr42.marketplacefeedapi.model.dto.*;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.service.JobService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -132,7 +129,7 @@ public class JobController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     @Operation(summary = "Обновление услуги", responses = {
             @ApiResponse(responseCode = "200", description = "Услуга создана",
                 content = @Content(schema = @Schema(implementation = Job.class))),
@@ -207,11 +204,10 @@ public class JobController {
                 }
             ))
     })
-    public ResponseEntity<Job> updateJob(@PathVariable UUID id,
-                                         @RequestBody @Valid CreateJobDto dto,
+    public ResponseEntity<Job> updateJob(@RequestBody @Valid UpdateJobDto dto,
                                          @AuthenticationPrincipal UserEntity user) {
-        log.info("Processing update job request. jobId={}, userId={}", id, user.getId());
-        Job result = jobService.updateJob(id, dto, user);
+        log.info("Processing update job request. jobId={}, userId={}", dto.id(), user.getId());
+        Job result = jobService.updateJob(dto, user);
         return ResponseEntity.ok(result);
     }
 
