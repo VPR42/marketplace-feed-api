@@ -1,10 +1,7 @@
 package com.vpr42.marketplacefeedapi.service.impl;
 
 import com.vpr42.marketplacefeedapi.mappers.JobsMapper;
-import com.vpr42.marketplacefeedapi.model.dto.CreateJobDto;
-import com.vpr42.marketplacefeedapi.model.dto.Job;
-import com.vpr42.marketplacefeedapi.model.dto.JobEntityWithCount;
-import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
+import com.vpr42.marketplacefeedapi.model.dto.*;
 import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
@@ -59,18 +56,10 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new CategoryNotFoundException(dto.categoryId()));
         log.info("Fetched category: {} for createJob for user: {}", categoryEntity.getName(), initiator.getId());
 
-        Set<TagEntity> tags = tagsRepository.findByNameIn(dto.tags());
-        log.info("Fetched tags: {} for createJob for user: {}", tags, initiator.getId());
-        if (tags.size() < dto.tags().size()) {
-            Set<String> presentedName = tags.stream()
-                    .map(TagEntity::getName)
-                    .collect(Collectors.toSet());
-            // Удаляем тэги, которые есть в БД
-            dto.tags().removeAll(presentedName);
-            log.info("Given tags are absent: {}", dto.tags());
+        // Теги (новая логика — через TagDto → id)
+        Set<TagEntity> tags = getTagsOrThrow(dto.tags());
 
-            throw new TagsNotFoundException(dto.tags());
-        }
+        log.info("Fetched tags: {} for createJob for user: {}", tags, initiator.getId());
 
         JobEntity entity = JobsMapper.toEntity(dto, tags, categoryEntity, initiator);
         JobEntity createdService = jobRepository.save(entity);
@@ -140,15 +129,15 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional
-    public Job updateJob(UUID id, CreateJobDto dto, UserEntity initiator) {
-        log.info("Updating job with id: {} by user: {}", id, initiator.getId());
+    public Job updateJob(UpdateJobDto dto, UserEntity initiator) {
+        log.info("Updating job with id: {} by user: {}", dto.id() , initiator.getId());
 
-        JobEntity entity = jobRepository.findWithDetailsById(id)
-                .orElseThrow(() -> new JobNotFoundException(id));
+        JobEntity entity = jobRepository.findWithDetailsById(dto.id())
+                .orElseThrow(() -> new JobNotFoundException(dto.id()));
 
         // При желании — проверка, что редактирует владелец услуги
         if (!entity.getMasterInfo().getId().equals(initiator.getId())) {
-            throw new JobEditForbiddenException(id, initiator.getId());
+            throw new JobEditForbiddenException(dto.id(), initiator.getId());
         }
 
         if (jobRepository.findByMasterIdAndName(initiator.getId(), dto.name()).isPresent()) {
@@ -159,17 +148,9 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new CategoryNotFoundException(dto.categoryId()));
         log.info("Fetched category: {} for updateJob for user: {}", categoryEntity.getName(), initiator.getId());
 
-        Set<TagEntity> tags = tagsRepository.findByNameIn(dto.tags());
+        // Теги (новая логика — через TagDto → id)
+        Set<TagEntity> tags = getTagsOrThrow(dto.tags());
         log.info("Fetched tags: {} for updateJob for user: {}", tags, initiator.getId());
-        if (tags.size() < dto.tags().size()) {
-            Set<String> presentedName = tags.stream()
-                    .map(TagEntity::getName)
-                    .collect(Collectors.toSet());
-            dto.tags().removeAll(presentedName);
-            log.info("Given tags are absent: {}", dto.tags());
-
-            throw new TagsNotFoundException(dto.tags());
-        }
 
         entity.setName(dto.name());
         entity.setDescription(dto.description());
@@ -178,8 +159,31 @@ public class JobServiceImpl implements JobService {
         entity.setCategory(categoryEntity);
         entity.setTags(tags);
 
-        int orderCount = orderRepository.countByJobId(id);
+        int orderCount = orderRepository.countByJobId(dto.id());
 
         return JobsMapper.fromEntity(entity, orderCount);
     }
+
+    private Set<TagEntity> getTagsOrThrow(List<TagDto> dtoTags) {
+        Set<Integer> ids = dtoTags.stream()
+                .map(TagDto::id)
+                .collect(Collectors.toSet());
+
+        Set<TagEntity> tags = tagsRepository.findByIdIn(ids);
+
+        if (tags.size() < ids.size()) {
+            Set<Integer> foundIds = tags.stream()
+                    .map(TagEntity::getId)
+                    .collect(Collectors.toSet());
+
+            Set<Integer> missing = ids.stream()
+                    .filter(id -> !foundIds.contains(id))
+                    .collect(Collectors.toSet());
+
+            throw new TagsNotFoundException(missing);
+        }
+
+        return tags;
+    }
+
 }

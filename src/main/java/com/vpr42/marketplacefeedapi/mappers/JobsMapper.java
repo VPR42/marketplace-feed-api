@@ -28,11 +28,8 @@ public class JobsMapper {
             entity.getCreatedAt(),
             UserMapper.fromEntity(entity.getMasterInfo().getUser()),
             CategoryMapper.fromEntity(entity.getCategory()),
-            entity.getTags()
-                    .stream()
-                    .map(TagEntity::getName)
-                    .collect(Collectors.toSet()),
-            orderCount
+            TagMapper.fromEntities(entity.getTags().stream().toList()),
+                orderCount
         );
     }
 
