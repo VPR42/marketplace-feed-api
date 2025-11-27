@@ -4,8 +4,6 @@ services:
       dockerfile: ./Dockerfile
       context: ./
     restart: always
-    env_file:
-      - ".env"
     image: marketplace-feed-api
     container_name: marketplace-feed-api
     volumes:
