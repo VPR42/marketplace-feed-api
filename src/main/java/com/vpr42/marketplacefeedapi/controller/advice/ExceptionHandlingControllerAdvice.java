@@ -1,4 +1,4 @@
-package com.vpr42.marketplacefeedapi.controller;
+package com.vpr42.marketplacefeedapi.controller.advice;
 
 import com.vpr42.marketplacefeedapi.model.dto.ApiErrorResponse;
 import com.vpr42.marketplacefeedapi.model.enums.ApiError;

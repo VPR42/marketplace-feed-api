@@ -21,7 +21,6 @@ public class TagsServiceImpl implements TagsService {
     public List<TagDto> getAllTags() {
         List<TagEntity> tags = tagsRepository.findAll();
         log.info("Fetched {} tags from database", tags.size());
-
         return TagMapper.fromEntities(tags);
     }
 }

@@ -1,6 +1,10 @@
 package com.vpr42.marketplacefeedapi.controller;
 
-import com.vpr42.marketplacefeedapi.model.dto.*;
+import com.vpr42.marketplacefeedapi.model.dto.ApiErrorResponse;
+import com.vpr42.marketplacefeedapi.model.dto.CreateJobDto;
+import com.vpr42.marketplacefeedapi.model.dto.Job;
+import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
+import com.vpr42.marketplacefeedapi.model.dto.UpdateJobDto;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import com.vpr42.marketplacefeedapi.service.JobService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -97,7 +100,6 @@ public class JobController {
                                          @AuthenticationPrincipal UserEntity user) {
         log.info("Processing new create job request from user: {}", user.getId());
         Job result = jobService.createJob(dto, user);
-
         return ResponseEntity.ok(result);
     }
 

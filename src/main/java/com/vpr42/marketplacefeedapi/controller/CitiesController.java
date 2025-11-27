@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Cities", description = "Контроллер для городов")
 public class CitiesController {
     private final CityService cityService;
+    private final Logger logger = LoggerFactory.getLogger(CitiesController.class);
 
     @GetMapping
     @Operation(summary = "Получение списка городов с фильтрами", responses = {
@@ -46,6 +49,7 @@ public class CitiesController {
         @RequestParam(value = "pageSize", required = false, defaultValue = "15")
         int pageSize
     ) {
+        logger.info("Request to get cities list");
         return ResponseEntity
                 .ok(cityService.getCities(query,
                         withJobs,

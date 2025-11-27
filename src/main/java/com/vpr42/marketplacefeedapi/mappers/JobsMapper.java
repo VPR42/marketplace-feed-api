@@ -9,7 +9,6 @@ import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Маппер для услуг
@@ -17,8 +16,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JobsMapper {
     public static Job fromEntity(JobEntity entity, long orderCount) {
-        log.info("Converting ServiceEntity to dto: {}", entity);
-
         return new Job(
             entity.getId(),
             entity.getName(),
@@ -37,8 +34,6 @@ public class JobsMapper {
                                      Set<TagEntity> tags,
                                      CategoryEntity category,
                                      UserEntity user) {
-        log.info("Converting CreateServiceDto to entity: {} for user with id: {}", dto, user.getId());
-
         return JobEntity.builder()
                 .name(dto.name())
                 .description(dto.description())
