@@ -20,7 +20,7 @@ public record Job(
     String coverUrl,
 
     LocalDateTime createdAt,
-    User master,
+    User user,
     Category category,
     Set<String> tags,
 
