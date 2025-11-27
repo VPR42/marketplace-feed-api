@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Set;
 
 public interface TagsRepository extends ListCrudRepository<TagEntity, Integer> {
-    Set<TagEntity> findByNameIn(List<String> names);
+    Set<TagEntity> findByIdIn(Set<Integer> ids);
 }

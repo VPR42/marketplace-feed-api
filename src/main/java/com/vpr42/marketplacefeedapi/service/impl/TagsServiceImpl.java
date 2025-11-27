@@ -16,13 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TagsServiceImpl implements TagsService {
     private final TagsRepository tagsRepository;
-    private final TagMapper tagMapper;
 
     @Override
     public List<TagDto> getAllTags() {
         List<TagEntity> tags = tagsRepository.findAll();
         log.info("Fetched {} tags from database", tags.size());
 
-        return tagMapper.fromEntities(tags);
+        return TagMapper.fromEntities(tags);
     }
 }

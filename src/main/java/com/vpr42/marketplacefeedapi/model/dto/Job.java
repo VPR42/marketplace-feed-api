@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public record Job(
     LocalDateTime createdAt,
     User user,
     Category category,
-    Set<String> tags,
+    List<TagDto> tags,
 
     @Schema(description = "Число заказов услуги")
     Long ordersCount
