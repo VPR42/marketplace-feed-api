@@ -29,9 +29,11 @@ eureka:
 springdoc:
   api-docs:
     enabled: true
+    path: /api/feed/docs
   swagger-ui:
     csrf:
       enabled: true
+    path: /api/feed/swagger
 
 server:
   port: 33303
