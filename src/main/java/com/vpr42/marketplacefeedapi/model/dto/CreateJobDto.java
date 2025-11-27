@@ -46,6 +46,6 @@ public record CreateJobDto(
 
     @NotEmpty(message = "Job must have at least 1 tag")
     @Schema(description = "Список тэгов", minLength = 1)
-    List<TagDto> tags
+    List<Integer> tags
 ) {
 }

@@ -2,7 +2,6 @@ package com.vpr42.marketplacefeedapi.mappers;
 
 import com.vpr42.marketplacefeedapi.model.dto.TagDto;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
