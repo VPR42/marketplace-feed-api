@@ -3,14 +3,12 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./
-    restart: always
     env_file:
-      - ".env"
-    image: marketplace-feed-api
+      - ./dev.env
     container_name: marketplace-feed-api
     volumes:
-      - /home/kinoko/logs/marketplace-feed-api:/logs
-    #      - ./logs:/logs                             # Для отладки на windows машине
+#      - /home/kinoko/logs/marketplace-feed-api:/logs
+      - ./logs:/logs                             # Для отладки на windows машине
     networks:
       - backend
     ports:

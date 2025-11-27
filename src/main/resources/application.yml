@@ -5,5 +5,38 @@ spring:
   application:
     name: marketplace-feed-api
 
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:prod}
+
+  sql:
+    init:
+      mode: never
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  datasource:
+    url: jdbc:postgresql://kinoko.su:5432/mp_db_dev
+    username: mp_dev_user
+    password: mp_dev_passwd
+    driver-class: org.postgresql.Driver
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://marketplace-eureka:33307/eureka
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api/feed/docs
+  swagger-ui:
+    csrf:
+      enabled: true
+    path: /api/feed/swagger
+
 server:
   port: 33303
