@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MasterInfoMapper {
     public static Master fromEntity(MasterInfoEntity entity) {
-        log.info("Converting MasterInfoEntity to dto: {}", entity);
-
         return new Master(
             entity.getExperience(),
             entity.getDescription(),

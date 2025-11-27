@@ -1,7 +1,6 @@
 package com.vpr42.marketplacefeedapi.service.impl;
 
 import com.vpr42.marketplacefeedapi.mappers.CityMapper;
-import com.vpr42.marketplacefeedapi.mappers.JobsMapper;
 import com.vpr42.marketplacefeedapi.model.dto.City;
 import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
 import com.vpr42.marketplacefeedapi.repository.CityRepository;
@@ -33,7 +32,7 @@ public class CityServiceImpl implements CityService {
                 orderedByJobsCount,
                 query);
         var cities = cityRepository.findAll(specification, PageRequest.of(page, pageSize));
-        log.info("Found: {}", cities.get().toList());
+        log.info("Found cities: {}", cities.get().toList());
         return cities.map(CityMapper::fromEntity);
     }
 }

@@ -49,14 +49,16 @@ public class JobServiceImpl implements JobService {
     public Job createJob(CreateJobDto dto, UserEntity initiator) {
         Optional<JobEntity> oldJob = jobRepository.findByMasterIdAndName(initiator.getId(), dto.name());
 
-        if (oldJob.isPresent())
+        if (oldJob.isPresent()) {
             throw new JobAlreadyExistsForUser(dto.name());
+        }
 
-        CategoryEntity categoryEntity = categoryRepository.findById(dto.categoryId())
+        CategoryEntity categoryEntity = categoryRepository
+                .findById(dto.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(dto.categoryId()));
+
         log.info("Fetched category: {} for createJob for user: {}", categoryEntity.getName(), initiator.getId());
 
-        // Теги (новая логика — через TagDto → id)
         Set<TagEntity> tags = getTagsOrThrow(dto.tags());
 
         log.info("Fetched tags: {} for createJob for user: {}", tags, initiator.getId());
@@ -100,16 +102,13 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public void deleteJob(UUID jobId, UserEntity initiator) {
-        // Проверка существования услуги
         JobEntity job = jobRepository.findById(jobId)
                 .orElseThrow(JobsNotFoundException::new);
 
-        // Проверка прав доступа - только владелец может удалять свою услугу
         if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
             throw new AccessDeniedException("You can only delete your own jobs");
         }
 
-        // Удаление основной сущности
         jobRepository.delete(job);
         log.info("Job with id: {} successfully deleted by user: {}", jobId, initiator.getId());
     }
@@ -119,7 +118,8 @@ public class JobServiceImpl implements JobService {
     public Job getJobById(UUID id) {
         log.info("Fetching job by id: {}", id);
 
-        JobEntity entity = jobRepository.findWithDetailsById(id)
+        JobEntity entity = jobRepository
+                .findWithDetailsById(id)
                 .orElseThrow(() -> new JobNotFoundException(id));
 
         int orderCount = orderRepository.countByJobId(id);
@@ -135,7 +135,6 @@ public class JobServiceImpl implements JobService {
         JobEntity entity = jobRepository.findWithDetailsById(dto.id())
                 .orElseThrow(() -> new JobNotFoundException(dto.id()));
 
-        // При желании — проверка, что редактирует владелец услуги
         if (!entity.getMasterInfo().getId().equals(initiator.getId())) {
             throw new JobEditForbiddenException(dto.id(), initiator.getId());
         }
@@ -144,11 +143,12 @@ public class JobServiceImpl implements JobService {
             throw new JobAlreadyExistsForUser(dto.name());
         }
 
-        CategoryEntity categoryEntity = categoryRepository.findById(dto.categoryId())
+        CategoryEntity categoryEntity = categoryRepository
+                .findById(dto.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(dto.categoryId()));
+
         log.info("Fetched category: {} for updateJob for user: {}", categoryEntity.getName(), initiator.getId());
 
-        // Теги (новая логика — через TagDto → id)
         Set<TagEntity> tags = getTagsOrThrow(dto.tags());
         log.info("Fetched tags: {} for updateJob for user: {}", tags, initiator.getId());
 
@@ -164,19 +164,15 @@ public class JobServiceImpl implements JobService {
         return JobsMapper.fromEntity(entity, orderCount);
     }
 
-    private Set<TagEntity> getTagsOrThrow(List<TagDto> dtoTags) {
-        Set<Integer> ids = dtoTags.stream()
-                .map(TagDto::id)
-                .collect(Collectors.toSet());
+    private Set<TagEntity> getTagsOrThrow(List<Integer> tagsIds) {
+        Set<TagEntity> tags = tagsRepository.findByIdIn(tagsIds);
 
-        Set<TagEntity> tags = tagsRepository.findByIdIn(ids);
-
-        if (tags.size() < ids.size()) {
+        if (tags.size() < tagsIds.size()) {
             Set<Integer> foundIds = tags.stream()
                     .map(TagEntity::getId)
                     .collect(Collectors.toSet());
 
-            Set<Integer> missing = ids.stream()
+            Set<Integer> missing = tagsIds.stream()
                     .filter(id -> !foundIds.contains(id))
                     .collect(Collectors.toSet());
 

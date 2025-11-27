@@ -28,18 +28,17 @@ public class FavouriteServiceImpl implements FavouriteService {
     @Transactional
     public void addToFavourite(AddToFavouriteDto dto, UserEntity user) {
         if (isJobInFavourite(dto.jobId(), user)) {
-            log.info("Job {} is already in favourites for user {}", dto.jobId(), user.getId());
-
+            log.warn("Job {} is already in favourites for user {}", dto.jobId(), user.getId());
             return;
         }
 
-        JobEntity job = jobRepository.findById(dto.jobId())
+        JobEntity job = jobRepository
+                .findById(dto.jobId())
                 .orElseThrow(() -> new JobNotFoundException(dto.jobId()));
 
         // Проверяем, что пользователь не пытается добавить свою же услугу
         if (isUserJobOwner(job, user)) {
-            log.warn("User {} attempted to add their own job {} to favourites", user.getId(), dto.jobId());
-
+            log.error("User {} attempted to add their own job {} to favourites", user.getId(), dto.jobId());
             throw new SelfFavouriteException();
         }
 
@@ -66,7 +65,6 @@ public class FavouriteServiceImpl implements FavouriteService {
     @Transactional
     public boolean isJobInFavourite(UUID jobId, UserEntity user) {
         FavouriteKey key = new FavouriteKey(user.getId(), jobId);
-
         return favouriteJobRepository.existsById(key);
     }
 

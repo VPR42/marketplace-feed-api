@@ -22,7 +22,6 @@ public class TagsController {
     public ResponseEntity<List<TagDto>> getAllTags() {
         log.info("Processing get all tags request");
         List<TagDto> tags = tagsService.getAllTags();
-
         return ResponseEntity.ok(tags);
     }
 }
