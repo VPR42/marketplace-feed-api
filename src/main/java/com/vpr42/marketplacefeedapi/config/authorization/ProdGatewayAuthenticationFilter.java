@@ -19,7 +19,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class ProdGatewayAuthenticationFilter extends OncePerRequestFilter {
-    private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;;
 
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request,
@@ -28,7 +28,8 @@ public class ProdGatewayAuthenticationFilter extends OncePerRequestFilter {
         log.info("Processing new user request");
 
         String idValue = request.getHeader("id");
-        String emailValue = request.getHeader("id");
+        String emailValue = request.getHeader("email");
+        log.info("Extracted: id: {}, email: {}", idValue, emailValue);
         if (idValue == null || emailValue == null
                 || idValue.isBlank() || emailValue.isBlank()) {
             log.info("User doesn't have credentials info from gateway");
@@ -42,8 +43,14 @@ public class ProdGatewayAuthenticationFilter extends OncePerRequestFilter {
             this.authenticationManager.authenticate(authentication);
         } catch (IllegalArgumentException exception) {
             log.error("Invalid credentials. Id can't be null");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+            return;
         } catch (Exception ex) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             log.error("Failed to authenticate user. Reason", ex);
+
+            return;
         }
 
         filterChain.doFilter(request, response);

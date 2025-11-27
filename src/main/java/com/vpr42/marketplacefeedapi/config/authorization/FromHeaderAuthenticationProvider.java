@@ -1,11 +1,9 @@
 package com.vpr42.marketplacefeedapi.config.authorization;
 
-import com.vpr42.marketplacefeedapi.model.exception.AuthenticationTokenIsNullException;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +18,7 @@ public class FromHeaderAuthenticationProvider implements AuthenticationProvider 
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        FromHeaderAuthorizationToken token = (FromHeaderAuthorizationToken) authentication.getPrincipal();
+        FromHeaderAuthorizationToken token = (FromHeaderAuthorizationToken) authentication;
         if (token == null) {
             log.error("User header token is null");
             throw new BadCredentialsException("Authentication token is null");
