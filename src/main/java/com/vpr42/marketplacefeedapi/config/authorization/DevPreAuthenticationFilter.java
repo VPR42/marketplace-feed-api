@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +20,7 @@ import java.io.IOException;
  */
 @Component
 @RequiredArgsConstructor
+@Profile("dev")
 public class DevPreAuthenticationFilter extends OncePerRequestFilter {
     private static final String TEST_USER_EMAIL = "test@mail.ru";
 
@@ -35,6 +37,7 @@ public class DevPreAuthenticationFilter extends OncePerRequestFilter {
                 null,
                 user.getAuthorities()
         );
+        logger.info("Add test data to request context");
 
         SecurityContextHolder.getContext().setAuthentication(auth);
         filterChain.doFilter(request, response);

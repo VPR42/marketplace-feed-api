@@ -18,11 +18,9 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class DevSecurityConfig {
-    private final DevPreAuthenticationFilter devPreAuthenticationFilter;
-
     @Bean
     @Profile("dev")
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, DevPreAuthenticationFilter devPreAuthenticationFilter) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .addFilterBefore(devPreAuthenticationFilter, AbstractPreAuthenticatedProcessingFilter.class)
