@@ -99,6 +99,10 @@ public class UserEntity implements UserDetails {
     @Builder.Default
     List<OrderEntity> orders = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
+    List<JobEntity> jobs = new ArrayList<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("USER"));

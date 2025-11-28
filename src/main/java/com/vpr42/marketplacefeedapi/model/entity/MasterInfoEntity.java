@@ -9,7 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -21,9 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,8 +34,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@ToString(exclude = {"user", "skills", "jobs"})
-@EqualsAndHashCode(exclude = {"user", "skills", "jobs"})
+@ToString(exclude = {"user", "skills"})
+@EqualsAndHashCode(exclude = {"user", "skills"})
 public class MasterInfoEntity {
     @Id
     UUID id;
@@ -54,14 +51,23 @@ public class MasterInfoEntity {
     @Column(name = "description")
     String description;
 
+    @Column(name = "about", nullable = true)
+    String about;
+
     @Column(name = "pseudonym", unique = true)
     String pseudonym;
 
     @Column(name = "phone_number", nullable = false, unique = true)
     String phoneNumber;
 
-    @Column(name = "working_hours")
-    String workingHours;
+    @Column(name = "days_of_week")
+    int[] daysOfWeek;
+
+    @Column(name = "start_time")
+    String startTime;
+
+    @Column(name = "end_time")
+    String endTime;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
@@ -71,8 +77,4 @@ public class MasterInfoEntity {
     )
     @Builder.Default
     Set<SkillEntity> skills = new HashSet<>();
-
-    @OneToMany(mappedBy = "masterInfo", fetch = FetchType.LAZY)
-    @Builder.Default
-    List<JobEntity> jobs = new ArrayList<>();
 }

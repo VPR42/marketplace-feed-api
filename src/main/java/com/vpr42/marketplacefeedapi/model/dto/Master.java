@@ -10,8 +10,10 @@ import java.util.Set;
  * @param description Описание
  * @param pseudonym Псевдоним
  * @param phoneNumber Номер телефона
- * @param workingHours Рабочие часы
  * @param skills Список навыков
+ * @param daysOfWeek Дни недели
+ * @param startTime Начало рабочего дня
+ * @param endTime Конец рабочего дня
  */
 @Schema(description = "Мастер")
 public record Master(
@@ -19,8 +21,9 @@ public record Master(
     String description,
     String pseudonym,
     String phoneNumber,
-    @Schema(description = "Рабочие часы в виде 9:00-20:00")
-    String workingHours,
     @Schema(description = "Список навыков")
-    Set<String> skills
+    Set<String> skills,
+    int[] daysOfWeek,
+    String startTime,
+    String endTime
 ) { }

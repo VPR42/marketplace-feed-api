@@ -31,9 +31,9 @@ public class JobFilteringSpecification {
             query.select(root.get("id"));
 
             // Join-ы
-            Join<JobEntity, MasterInfoEntity> master = root.join("masterInfo");
+            Join<JobEntity, UserEntity> user = root.join("user");
             Join<JobEntity, CategoryEntity> category = null;
-            Join<MasterInfoEntity, UserEntity> user = null;
+            Join<UserEntity, MasterInfoEntity> master = user.join("masterInfo", JoinType.LEFT);
             Join<UserEntity, CityEntity> city = null;
             Join<JobEntity, OrderEntity> orders = null;
 
@@ -42,7 +42,6 @@ public class JobFilteringSpecification {
             }
 
             if (filters.getCityId() != null && filters.getCityId() > 0) {
-                user = master.join("user");
                 city = user.join("city");
             }
 
@@ -74,7 +73,7 @@ public class JobFilteringSpecification {
                     && filters.getExperience() > 0) {
                 whereStatements.add(
                     cb.greaterThanOrEqualTo(
-                        master.get("experience"),
+                        cb.coalesce(master.get("experience"), 0L),
                         (long) filters.getExperience()
                     )
                 );
@@ -145,8 +144,9 @@ public class JobFilteringSpecification {
             if (filters.getSkills() != null && filters.getSkills().length > 0) {
                 Subquery<UUID> skillsSubquery = query.subquery(UUID.class);
                 Root<JobEntity> subroot = skillsSubquery.from(JobEntity.class);
-                Join<JobEntity, MasterInfoEntity> subrootMaster = subroot.join("masterInfo");
-                Join<MasterInfoEntity, SkillEntity> skillsJoin = subrootMaster.join("skills", JoinType.LEFT);
+                Join<JobEntity, UserEntity> subrootUser = subroot.join("user");
+                Join<UserEntity, MasterInfoEntity> subrootMaster = subrootUser.join("masterInfo", JoinType.INNER);
+                Join<MasterInfoEntity, SkillEntity> skillsJoin = subrootMaster.join("skills", JoinType.INNER);
                 skillsSubquery.select(subroot.get("id"))
                         .where(cb.and(skillsJoin.get("name").isNotNull(),
                                 skillsJoin.get("name")

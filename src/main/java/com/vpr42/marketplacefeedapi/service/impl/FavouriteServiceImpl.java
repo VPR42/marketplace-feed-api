@@ -75,8 +75,6 @@ public class FavouriteServiceImpl implements FavouriteService {
      * @return true если пользователь владелец услуги, иначе false
      */
     private boolean isUserJobOwner(JobEntity job, UserEntity user) {
-        return job.getMasterInfo() != null &&
-                job.getMasterInfo().getUser() != null &&
-                job.getMasterInfo().getUser().getId().equals(user.getId());
+        return job.getUser().getId().equals(user.getId());
     }
 }
