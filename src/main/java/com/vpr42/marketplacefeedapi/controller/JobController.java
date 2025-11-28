@@ -235,10 +235,11 @@ public class JobController {
                 ))
     })
     public ResponseEntity<Page<Job>> getJobs(
-        @ModelAttribute @Valid JobFilters filters
+        @ModelAttribute @Valid JobFilters filters,
+        @AuthenticationPrincipal UserEntity user
     ) {
         return ResponseEntity
-                .ok(jobService.getJobsFiltered(filters));
+                .ok(jobService.getJobsFiltered(filters, user.getId()));
     }
 
     @DeleteMapping("/{id}")
