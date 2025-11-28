@@ -8,11 +8,11 @@ import com.vpr42.marketplacefeedapi.repository.criteria.CityFiltersSpecification
 import com.vpr42.marketplacefeedapi.service.CityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -22,17 +22,17 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @Transactional
-    public Page<City> getCities(String query,
+    public List<City> getCities(String query,
                                 boolean withJobs,
-                                boolean orderedByJobsCount,
-                                int page,
-                                int pageSize) {
+                                boolean orderedByJobsCount) {
 
         Specification<CityEntity> specification = CityFiltersSpecification.filtered(withJobs,
                 orderedByJobsCount,
                 query);
-        var cities = cityRepository.findAll(specification, PageRequest.of(page, pageSize));
-        log.info("Found cities: {}", cities.get().toList());
-        return cities.map(CityMapper::fromEntity);
+        var cities = cityRepository.findAll(specification);
+        log.info("Found cities: {}", cities);
+        return cities.stream()
+                .map(CityMapper::fromEntity)
+                .toList();
     }
 }
