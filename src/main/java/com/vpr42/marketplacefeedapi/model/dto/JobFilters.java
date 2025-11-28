@@ -34,10 +34,10 @@ public class JobFilters {
     private Integer categoryId;
 
     @Schema(description = "Список навыков мастера / NULL", nullable = true)
-    private String[] skills;
+    private Integer[] skills;
 
     @Schema(description = "Список тэгов услуги / NULL", nullable = true)
-    private String[] tags;
+    private Integer[] tags;
 
     @Schema(description = "Флаг, при true получает записи из избранного", nullable = true)
     private boolean fromFavourites;

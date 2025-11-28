@@ -150,11 +150,11 @@ public class JobFilteringSpecification {
                 Join<JobEntity, TagEntity> tagsJoin = subroot.join("tags");
                 tagsSubquery.select(subroot.get("id"))
                         .where(
-                            tagsJoin.get("name").in(Arrays.asList(filters.getTags()))
+                            tagsJoin.get("id").in(Arrays.asList(filters.getTags()))
                         )
                         .groupBy(subroot.get("id"))
                         .having(cb.equal(
-                            cb.countDistinct(tagsJoin.get("name")),
+                            cb.countDistinct(tagsJoin.get("id")),
                             filters.getTags().length
                         ));
 
@@ -169,13 +169,13 @@ public class JobFilteringSpecification {
                 Join<UserEntity, MasterInfoEntity> subrootMaster = subrootUser.join("masterInfo", JoinType.INNER);
                 Join<MasterInfoEntity, SkillEntity> skillsJoin = subrootMaster.join("skills", JoinType.INNER);
                 skillsSubquery.select(subroot.get("id"))
-                        .where(cb.and(skillsJoin.get("name").isNotNull(),
-                                skillsJoin.get("name")
-                                .in(Arrays.asList(filters.getTags())))
+                        .where(cb.and(skillsJoin.get("id").isNotNull(),
+                                skillsJoin.get("id")
+                                .in(Arrays.asList(filters.getSkills())))
                         )
                         .groupBy(subroot.get("id"))
                         .having(cb.equal(
-                                cb.countDistinct(skillsJoin.get("name")),
+                                cb.countDistinct(skillsJoin.get("id")),
                                 filters.getSkills().length
                         ));
 
