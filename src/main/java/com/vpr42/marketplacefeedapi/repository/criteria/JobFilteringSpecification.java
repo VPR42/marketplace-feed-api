@@ -3,6 +3,7 @@ package com.vpr42.marketplacefeedapi.repository.criteria;
 import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
 import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
 import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
+import com.vpr42.marketplacefeedapi.model.entity.FavouriteJobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.MasterInfoEntity;
 import com.vpr42.marketplacefeedapi.model.entity.OrderEntity;
@@ -17,6 +18,7 @@ import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -24,18 +26,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 public class JobFilteringSpecification {
 
-    public static Specification<JobEntity> filter(JobFilters filters) {
+    public static Specification<JobEntity> filter(JobFilters filters, UUID initiatorId) {
         return (root, query, cb) -> {
             query.select(root.get("id"));
 
+            log.debug("Initiator: {}", initiatorId);
             // Join-ы
             Join<JobEntity, UserEntity> user = root.join("user");
             Join<JobEntity, CategoryEntity> category = null;
             Join<UserEntity, MasterInfoEntity> master = user.join("masterInfo", JoinType.LEFT);
             Join<UserEntity, CityEntity> city = null;
             Join<JobEntity, OrderEntity> orders = null;
+            Join<JobEntity, FavouriteJobEntity> favourites = null;
+            Join<FavouriteJobEntity, UserEntity> userWithLikes = null;
 
             if (filters.getCategoryId() != null && filters.getCategoryId() > 0) {
                 category = root.join("category");
@@ -48,6 +54,11 @@ public class JobFilteringSpecification {
             if (filters.getOrdersCountSort() != null
                     || filters.getMinOrders() != null && filters.getMinOrders() > 0) {
                 orders = root.join("orders", JoinType.LEFT);
+            }
+
+            if (filters.isFromFavourites()) {
+                favourites = root.join("inFavourites", JoinType.RIGHT);
+                userWithLikes = favourites.join("user", JoinType.INNER);
             }
 
             // Where
@@ -87,6 +98,16 @@ public class JobFilteringSpecification {
                     )
                 );
             }
+
+            if (filters.isFromFavourites()) {
+                whereStatements.add(
+                    cb.equal(
+                        userWithLikes.get("id"),
+                        initiatorId
+                    )
+                );
+            }
+
             if (filters.getMinPrice() != null || filters.getMaxPrice() != null) {
                 int min = filters.getMinPrice() != null
                         ? filters.getMinPrice()

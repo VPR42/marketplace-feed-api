@@ -45,7 +45,7 @@ public class ExceptionHandlingControllerAdvice {
      */
     @ExceptionHandler
     public ResponseEntity<ApiErrorResponse> handleApplicationException(ApplicationException exception) {
-        log.error("An error occurred processing request", exception);
+        log.error("An error occurred processing request: {}", exception.getMessage());
 
         return ResponseEntity
                 .status(exception.getStatusCode())
