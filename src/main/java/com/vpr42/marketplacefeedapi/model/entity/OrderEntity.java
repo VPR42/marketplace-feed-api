@@ -19,6 +19,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 /**
@@ -53,4 +54,7 @@ public class OrderEntity {
     @Column(name = "ordered_at", nullable = false)
     @Builder.Default
     LocalDateTime orderedAt = LocalDateTime.now();
+
+    @Column(name = "status_changed_at")
+    Instant statusChangedAt;
 }

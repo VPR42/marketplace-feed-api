@@ -2,7 +2,6 @@ package com.vpr42.marketplacefeedapi.repository.criteria;
 
 import com.vpr42.marketplacefeedapi.model.entity.CityEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
-import com.vpr42.marketplacefeedapi.model.entity.MasterInfoEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
@@ -24,9 +23,8 @@ public class CityFiltersSpecification {
             Expression<String> concatTwo = cb.concat(concatOne, root.get("name"));
             if (withJobs || sortByJobsCount) {
                 Join<CityEntity, UserEntity> user = root.join("users", JoinType.LEFT);
-                Join<UserEntity, MasterInfoEntity> master = user.join("masterInfo", JoinType.LEFT);
                 JoinType type = withJobs ? JoinType.INNER : JoinType.LEFT;
-                Join<MasterInfoEntity, JobEntity> jobs = master.join("jobs", type);
+                Join<UserEntity, JobEntity> jobs = user.join("jobs", type);
                 query.groupBy(root);
                 if (sortByJobsCount) {
                     query.orderBy(

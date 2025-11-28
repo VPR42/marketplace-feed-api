@@ -41,27 +41,27 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"tags", "masterInfo", "category", "orders"})
-@EqualsAndHashCode(exclude = {"tags", "masterInfo", "category", "orders"})
+@ToString(exclude = {"tags", "user", "category", "orders"})
+@EqualsAndHashCode(exclude = {"tags", "user", "category", "orders"})
 @NamedEntityGraph(
         name = "JobEntity_withAdditionalInfo",
         attributeNodes = {
                 @NamedAttributeNode("category"),
                 @NamedAttributeNode("tags"),
-                @NamedAttributeNode(value = "masterInfo", subgraph = "subgraph.masterInfo")
+                @NamedAttributeNode(value = "user", subgraph = "subgraph.user")
         },
         subgraphs = {
                 @NamedSubgraph(
-                        name = "subgraph.masterInfo",
+                        name = "subgraph.user",
                         attributeNodes = {
-                            @NamedAttributeNode("skills"),
-                            @NamedAttributeNode(value = "user", subgraph = "subgraph.user")
+                            @NamedAttributeNode(value = "masterInfo", subgraph = "subgraph.masterInfo"),
+                            @NamedAttributeNode(value = "city")
                         }
                 ),
                 @NamedSubgraph(
-                    name = "subgraph.user",
+                    name = "subgraph.masterInfo",
                     attributeNodes = {
-                        @NamedAttributeNode("city"),
+                        @NamedAttributeNode("skills")
                     }
                 )
         }
@@ -90,7 +90,7 @@ public class JobEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
-    MasterInfoEntity masterInfo;
+    UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
