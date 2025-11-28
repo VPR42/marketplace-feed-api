@@ -33,7 +33,7 @@ public class JobFilteringSpecification {
         return (root, query, cb) -> {
             query.select(root.get("id"));
 
-            log.info("Initiator: {}", initiatorId);
+            log.debug("Initiator: {}", initiatorId);
             // Join-ы
             Join<JobEntity, UserEntity> user = root.join("user");
             Join<JobEntity, CategoryEntity> category = null;
