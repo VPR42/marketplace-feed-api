@@ -24,7 +24,7 @@ public class JobSecurityService {
             return true;
         }
 
-        if (user == null || user.getId() != job.user().id()) {
+        if (user == null || !user.getId().equals(job.user().id())) {
             log.warn("User doesn't have access for modification");
             return false;
         }
