@@ -26,6 +26,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,8 +42,8 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"tags", "user", "category", "orders"})
-@EqualsAndHashCode(exclude = {"tags", "user", "category", "orders"})
+@ToString(exclude = {"tags", "user", "category", "orders", "inFavourites"})
+@EqualsAndHashCode(exclude = {"tags", "user", "category", "orders", "inFavourites"})
 @NamedEntityGraph(
         name = "JobEntity_withAdditionalInfo",
         attributeNodes = {
@@ -91,6 +92,10 @@ public class JobEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
     UserEntity user;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "service")
+    @Builder.Default
+    List<FavouriteJobEntity> inFavourites = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

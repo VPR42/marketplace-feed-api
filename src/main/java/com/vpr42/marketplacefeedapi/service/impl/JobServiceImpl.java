@@ -71,8 +71,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional
-    public Page<Job> getJobsFiltered(JobFilters filters) {
-        Specification<JobEntity> criteriaSpec = JobFilteringSpecification.filter(filters);
+    public Page<Job> getJobsFiltered(JobFilters filters, UUID initiatorId) {
+        Specification<JobEntity> criteriaSpec = JobFilteringSpecification.filter(filters, initiatorId);
         Pageable pageable = PageRequest.of(filters.getPage(), filters.getPageSize());
         Page<JobEntity> jobIdsFiltered = jobRepository.findAll(criteriaSpec, pageable);
         log.info("Fetched {} jobs by given filters", jobIdsFiltered.getSize());

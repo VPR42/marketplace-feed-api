@@ -39,6 +39,9 @@ public class JobFilters {
     @Schema(description = "Список тэгов услуги / NULL", nullable = true)
     private String[] tags;
 
+    @Schema(description = "Флаг, при true получает записи из избранного", nullable = true)
+    private boolean fromFavourites;
+
     @Min(value = 0, message = "MinPrice must be positive or zero value")
     @Schema(description = "Минимальная цена / NULL", minimum = "0", nullable = true)
     private Integer minPrice;
