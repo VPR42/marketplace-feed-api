@@ -7,11 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.naming.AuthenticationException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -66,6 +68,16 @@ public class ExceptionHandlingControllerAdvice {
         return ResponseEntity
                 .internalServerError()
                 .build();
+    }
+
+    /**
+     * Ошибки SpringSecurity
+     */
+    @ExceptionHandler({AuthorizationDeniedException.class, AuthenticationException.class})
+    public void handleSecurityExceptions(Exception ex) throws Exception {
+        log.warn("Caught security exception in controller advice");
+
+        throw ex;
     }
 
     /**
