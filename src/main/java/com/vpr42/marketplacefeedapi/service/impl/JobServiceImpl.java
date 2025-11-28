@@ -105,7 +105,7 @@ public class JobServiceImpl implements JobService {
         JobEntity job = jobRepository.findById(jobId)
                 .orElseThrow(JobsNotFoundException::new);
 
-        if (!job.getMasterInfo().getUser().getId().equals(initiator.getId())) {
+        if (!job.getUser().getId().equals(initiator.getId())) {
             throw new AccessDeniedException("You can only delete your own jobs");
         }
 
@@ -135,7 +135,7 @@ public class JobServiceImpl implements JobService {
         JobEntity entity = jobRepository.findWithDetailsById(dto.id())
                 .orElseThrow(() -> new JobNotFoundException(dto.id()));
 
-        if (!entity.getMasterInfo().getId().equals(initiator.getId())) {
+        if (!entity.getUser().getId().equals(initiator.getId())) {
             throw new JobEditForbiddenException(dto.id(), initiator.getId());
         }
 

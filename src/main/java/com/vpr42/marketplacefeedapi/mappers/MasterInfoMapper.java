@@ -18,11 +18,13 @@ public class MasterInfoMapper {
             entity.getDescription(),
             entity.getPseudonym(),
             entity.getPhoneNumber(),
-            entity.getWorkingHours(),
             entity.getSkills()
                     .stream()
                     .map(SkillEntity::getName)
-                    .collect(Collectors.toSet())
+                    .collect(Collectors.toSet()),
+            entity.getDaysOfWeek(),
+            entity.getStartTime(),
+            entity.getEndTime()
         );
     }
 }

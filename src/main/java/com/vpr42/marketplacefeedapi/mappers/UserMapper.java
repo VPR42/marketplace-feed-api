@@ -18,7 +18,9 @@ public class UserMapper {
             user.getPatronymic(),
             user.getAvatarPath(),
             CityMapper.fromEntity(user.getCity()),
-            MasterInfoMapper.fromEntity(user.getMasterInfo())
+            user.getMasterInfo() != null
+                    ? MasterInfoMapper.fromEntity(user.getMasterInfo())
+                    : null
         );
     }
 }

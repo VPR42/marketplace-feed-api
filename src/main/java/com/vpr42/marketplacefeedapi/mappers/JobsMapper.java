@@ -23,7 +23,7 @@ public class JobsMapper {
             entity.getPrice(),
             entity.getCoverUrl(),
             entity.getCreatedAt(),
-            UserMapper.fromEntity(entity.getMasterInfo().getUser()),
+            UserMapper.fromEntity(entity.getUser()),
             CategoryMapper.fromEntity(entity.getCategory()),
             TagMapper.fromEntities(entity.getTags().stream().toList()),
                 orderCount
@@ -40,7 +40,7 @@ public class JobsMapper {
                 .price(dto.price())
                 .coverUrl(dto.coverUrl())
                 .category(category)
-                .masterInfo(user.getMasterInfo())
+                .user(user)
                 .tags(tags)
                 .build();
     }

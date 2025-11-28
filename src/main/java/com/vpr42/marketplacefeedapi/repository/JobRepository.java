@@ -16,8 +16,7 @@ public interface JobRepository extends JpaRepository<JobEntity, UUID>, JpaSpecif
     @Query("""
             SELECT job
             FROM JobEntity job
-            INNER JOIN job.masterInfo info
-            WHERE info.id = :masterId
+            WHERE job.user.id = :masterId
             AND job.name = :name
         """)
     Optional<JobEntity> findByMasterIdAndName(UUID masterId, String name);

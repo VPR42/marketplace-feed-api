@@ -54,7 +54,6 @@ public class DevDataInitializer {
                 .phoneNumber("0000000000")
                 .experience(3)
                 .pseudonym("Иван-Работник")
-                .workingHours("9:00-19:00")
                 .build();
 
         user.setMasterInfo(masterInfo);
