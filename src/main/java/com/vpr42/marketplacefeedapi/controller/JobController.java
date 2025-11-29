@@ -272,8 +272,8 @@ public class JobController {
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
                         examples = {
                             @ExampleObject(
-                                name = "TagsNotFound",
-                                summary = "Тэги/Категория не найдены",
+                                name = "JobNotFound",
+                                summary = "Услуга не найдена",
                                 value = """
                                 {
                                     "status": 404,
@@ -296,11 +296,70 @@ public class JobController {
     }
 
     @PatchMapping(value = "/cover", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @Operation(summary = "Обновление обложки услуги", responses = {
+            @ApiResponse(responseCode = "200", description = "Обложка обновлена"),
+            @ApiResponse(responseCode = "400", description = "Не удалось обновить обложку",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                examples = {
+                    @ExampleObject(
+                        name = "UnableToUpdateCover",
+                        summary = "Не удалось обновить обложку",
+                        value = """
+                                {
+                                    "status": 400,
+                                    "errorCode": "UNABLE_TO_UPDATE_COVER",
+                                    "message": "Unable to update cover for job: 000-00",
+                                    "errors": null
+                                }
+                                """
+                    )
+                })
+            ),
+            @ApiResponse(responseCode = "403", description = "Ошибки доступа",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                    examples = {
+                        @ExampleObject(
+                                name = "Forbidden",
+                                summary = "Доступ запрещен",
+                                value = """
+                                        {
+                                            "status": 403,
+                                            "errorCode": "FORBIDDEN",
+                                            "message": "Forbidden message",
+                                            "errors": null
+                                        }
+                                        """
+                        )
+                    }
+                )
+            ),
+            @ApiResponse(responseCode = "404", description = "Услуга не найдена",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class),
+                    examples = {
+                        @ExampleObject(
+                            name = "JobNotFound",
+                            summary = "Тэги/Категория не найдены",
+                            value = """
+                                    {
+                                        "status": 404,
+                                        "errorCode": "JOB_NOT_FOUND",
+                                        "message": "Job with id 000-00 is not found",
+                                        "errors": null
+                                    }
+                                    """
+                        )
+                    }
+                )
+            ),
+    })
     @PreAuthorize("@jobSecurityService.hasAccess(#jobId, authentication)")
     public ResponseEntity<CoverUploadResponse> updateCover(
         @RequestPart("file") MultipartFile file,
-        @RequestPart("id") UUID jobId
+        @RequestPart("id") UUID jobId,
+        @AuthenticationPrincipal UserEntity currentUser
     ) {
+        log.info("Processing update cover for job {} by user {}", jobId, currentUser.getId());
+
         return ResponseEntity.ok(jobService.updateCover(jobId, file));
     }
 }
