@@ -36,8 +36,8 @@ app:
     password: Kinok0Jap17096065
     bucket: mp-avatars
     urls:
-      api: http://minio:9000
-      public: https://bobr.kinoko.su/api/v1/buckets/mp-avatars/objects/download?prefix=
+      apiUrl: http://minio:9000
+      publicUrl: https://bobr.kinoko.su/api/v1/buckets/mp-avatars/objects/download?prefix=
   cover:
     allowedExtensions: .jpg, .jpeg, .png, .bmp, .webp
 
