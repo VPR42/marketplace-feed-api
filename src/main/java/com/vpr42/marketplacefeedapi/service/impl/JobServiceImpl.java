@@ -1,24 +1,34 @@
 package com.vpr42.marketplacefeedapi.service.impl;
 
+import com.vpr42.marketplacefeedapi.config.properties.CoverProperties;
+import com.vpr42.marketplacefeedapi.config.properties.MinioProperties;
 import com.vpr42.marketplacefeedapi.mappers.JobsMapper;
-import com.vpr42.marketplacefeedapi.model.dto.*;
+import com.vpr42.marketplacefeedapi.model.dto.CoverUploadResponse;
+import com.vpr42.marketplacefeedapi.model.dto.CreateJobDto;
+import com.vpr42.marketplacefeedapi.model.dto.Job;
+import com.vpr42.marketplacefeedapi.model.dto.JobEntityWithCount;
+import com.vpr42.marketplacefeedapi.model.dto.JobFilters;
+import com.vpr42.marketplacefeedapi.model.dto.UpdateJobDto;
 import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
-import com.vpr42.marketplacefeedapi.model.exception.AccessDeniedException;
 import com.vpr42.marketplacefeedapi.model.exception.CategoryNotFoundException;
+import com.vpr42.marketplacefeedapi.model.exception.InvalidFileException;
 import com.vpr42.marketplacefeedapi.model.exception.JobAlreadyExistsForUser;
-import com.vpr42.marketplacefeedapi.model.exception.JobEditForbiddenException;
 import com.vpr42.marketplacefeedapi.model.exception.JobNotFoundException;
 import com.vpr42.marketplacefeedapi.model.exception.JobsNotFoundException;
 import com.vpr42.marketplacefeedapi.model.exception.TagsNotFoundException;
+import com.vpr42.marketplacefeedapi.model.exception.UnableToUpdateCoverException;
 import com.vpr42.marketplacefeedapi.repository.CategoryRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
 import com.vpr42.marketplacefeedapi.repository.OrderRepository;
 import com.vpr42.marketplacefeedapi.repository.TagsRepository;
 import com.vpr42.marketplacefeedapi.repository.criteria.JobFilteringSpecification;
 import com.vpr42.marketplacefeedapi.service.JobService;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,6 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -43,6 +54,10 @@ public class JobServiceImpl implements JobService {
     private final TagsRepository tagsRepository;
     private final CategoryRepository categoryRepository;
     private final OrderRepository orderRepository;
+    private final MinioClient minioClient;
+
+    private final CoverProperties coverProperties;
+    private final MinioProperties minioProperties;
 
     @Override
     @Transactional
@@ -154,6 +169,81 @@ public class JobServiceImpl implements JobService {
         int orderCount = orderRepository.countByJobId(dto.id());
 
         return JobsMapper.fromEntity(entity, orderCount);
+    }
+
+    @Override
+    @Transactional
+    public CoverUploadResponse updateCover(UUID jobId, MultipartFile file) {
+        JobEntity job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new JobNotFoundException(jobId));
+
+        if (file.getOriginalFilename() == null)
+            throw new InvalidFileException();
+
+        String extension = extractFileExtension(file.getOriginalFilename());
+        if (!isValidCover(file, extension))
+            throw new InvalidFileException();
+
+        if (job.getCoverUrl() != null && job.getCoverUrl().startsWith(minioProperties.urls().publicUrl())) {
+            deleteOldCover(jobId, job);
+        }
+        String savedName = "%s-%s".formatted(
+            jobId.toString(),
+            file.getOriginalFilename()
+        );
+        String urlToFile = minioProperties.urls().publicUrl() + savedName;
+        log.info("Url for new uploaded file: {}", urlToFile);
+
+        loadCover(jobId, file);
+        job.setCoverUrl(urlToFile);
+
+        return new CoverUploadResponse(savedName, urlToFile);
+    }
+
+    private void loadCover(UUID jobId, MultipartFile file) {
+        try {
+            minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(minioProperties.bucket())
+                        .stream(file.getInputStream(), file.getSize(), -1)
+                        .contentType(file.getContentType())
+                        .build()
+            );
+
+            log.info("User successfully loaded new cover for job: {}", jobId);
+        } catch (Exception ex) {
+            log.error("Unable to load cover for file: {}", jobId, ex);
+
+            throw new UnableToUpdateCoverException(jobId);
+        }
+    }
+
+    private void deleteOldCover(UUID jobId, JobEntity job) {
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder()
+                    .bucket(minioProperties.bucket())
+                    .object(job.getCoverUrl())
+                    .build()
+            );
+
+            log.info("User deleted old cover for job with id: {}", jobId);
+        } catch (Exception ex) {
+            log.error("Unable to delete cover from minio for job: {}", jobId, ex);
+
+            throw new UnableToUpdateCoverException(jobId);
+        }
+    }
+
+    private static String extractFileExtension(String fileName) {
+        int pointIndex = fileName.lastIndexOf('.');
+        if (pointIndex == -1 || pointIndex == fileName.length() - 1)
+            throw new InvalidFileException();
+
+        return fileName.substring(pointIndex);
+    }
+
+    private boolean isValidCover(MultipartFile file, String extension) {
+        return file.getSize() > 0 && coverProperties.allowedExtensions().contains(extension);
     }
 
     private Set<TagEntity> getTagsOrThrow(List<Integer> tagsIds) {
