@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -206,6 +207,7 @@ public class JobController {
                 }
             ))
     })
+    @PreAuthorize("@jobSecurityService.hasAccess(#dto.id, authentication)")
     public ResponseEntity<Job> updateJob(@RequestBody @Valid UpdateJobDto dto,
                                          @AuthenticationPrincipal UserEntity user) {
         log.info("Processing update job request. jobId={}, userId={}", dto.id(), user.getId());
@@ -279,6 +281,7 @@ public class JobController {
                         }
                     )),
     })
+    @PreAuthorize("@jobSecurityService.hasAccess(#id, authentication)")
     public ResponseEntity<Void> deleteJob(@PathVariable UUID id,
                                           @AuthenticationPrincipal UserEntity currentUser) {
         log.info("Processing delete job request for job id: {} from user: {}", id, currentUser.getId());
