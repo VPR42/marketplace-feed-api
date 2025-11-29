@@ -4,21 +4,14 @@ logging:
 spring:
   application:
     name: marketplace-feed-api
-
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:prod}
-
   sql:
     init:
       mode: never
-
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate.format_sql: true
-
   datasource:
     url: jdbc:postgresql://kinoko.su:5432/mp_db_dev
     username: mp_dev_user
