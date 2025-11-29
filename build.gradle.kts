@@ -11,7 +11,7 @@ version = "1.0.0"
 
 val lombokVersion: String by project
 val postgresDriverVersion: String by project
-
+val minioVersion = "8.6.0"
 
 dependencyManagement {
     imports {
@@ -48,6 +48,9 @@ dependencies {
 
     // Eureka
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+
+    // Minio
+    implementation("io.minio:minio:$minioVersion")
 
     // Test
     testCompileOnly("org.projectlombok:lombok:$lombokVersion")
