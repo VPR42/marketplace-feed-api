@@ -5,6 +5,9 @@ logging:
     com.vpr42.marketplacefeedapi.config.authorization: error
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
   application:
     name: marketplace-feed-api
   profiles:
@@ -30,7 +33,7 @@ app:
       api: http://minio:9000
       public: https://bobr.kinoko.su/api/v1/buckets/mp-avatars/objects/download?prefix=
   cover:
-    allowedExtensions: .jpg, .jpeg, .png
+    allowedExtensions: .jpg, .jpeg, .png, .bmp, .webp
 
 eureka:
   client:
