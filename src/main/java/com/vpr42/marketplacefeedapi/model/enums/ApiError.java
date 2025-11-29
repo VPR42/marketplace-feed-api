@@ -9,5 +9,7 @@ public enum ApiError {
     JOB_NOT_FOUND,
     SELF_FAVOURITE,
     JOBS_NOT_FOUND,
-    FORBIDDEN
+    FORBIDDEN,
+    INVALID_FILE,
+    UNABLE_TO_UPDATE_COVER
 }
