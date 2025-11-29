@@ -2,6 +2,7 @@ logging:
   config: 'classpath:log4j2.yml'
   level:
     com.netflix.discovery.shared: error
+    com.vpr42.marketplacefeedapi.config.authorization: error
 
 spring:
   application:
@@ -18,7 +19,7 @@ spring:
     url: jdbc:postgresql://kinoko.su:5432/mp_db_dev
     username: mp_dev_user
     password: mp_dev_passwd
-    driver-class: org.postgresql.Driver
+    driver-class-name: org.postgresql.Driver
 
 eureka:
   client:
