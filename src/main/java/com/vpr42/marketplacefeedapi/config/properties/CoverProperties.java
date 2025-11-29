@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Set;
 
-@ConfigurationProperties(prefix = "api.cover")
+@ConfigurationProperties(prefix = "app.cover")
 public record CoverProperties(
     Set<String> allowedExtensions
 ) {
