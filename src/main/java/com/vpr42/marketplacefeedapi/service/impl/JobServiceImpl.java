@@ -165,7 +165,6 @@ public class JobServiceImpl implements JobService {
         entity.setName(dto.name());
         entity.setDescription(dto.description());
         entity.setPrice(dto.price());
-        entity.setCoverUrl(dto.coverUrl());
         entity.setCategory(categoryEntity);
         entity.setTags(tags);
 

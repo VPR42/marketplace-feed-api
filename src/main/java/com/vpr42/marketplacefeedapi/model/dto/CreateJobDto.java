@@ -5,7 +5,6 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.List;
  * @param name Название услуги
  * @param description Описание услуги
  * @param price Цена
- * @param coverUrl Url обложки
  * @param categoryId Id категории
  * @param tags Список тэгов в виде строк
  */
@@ -35,10 +33,6 @@ public record CreateJobDto(
     @DecimalMin(value = "100", message = "Job price ${formatter.format('%1$.2f', validatedValue)} must be higher than {value}")
     @Schema(description = "Цена (от 100 до 999999)", minimum = "100")
     BigDecimal price,
-
-    @URL(message = "Cover must be a valid url")
-    @Schema(description = "Url обложки / NULL", nullable = true)
-    String coverUrl,
 
     @NotNull(message = "Job must have category")
     @Schema(description = "Id категории")
