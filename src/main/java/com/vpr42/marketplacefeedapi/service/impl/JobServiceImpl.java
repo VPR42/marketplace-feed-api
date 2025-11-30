@@ -13,13 +13,7 @@ import com.vpr42.marketplacefeedapi.model.entity.CategoryEntity;
 import com.vpr42.marketplacefeedapi.model.entity.JobEntity;
 import com.vpr42.marketplacefeedapi.model.entity.TagEntity;
 import com.vpr42.marketplacefeedapi.model.entity.UserEntity;
-import com.vpr42.marketplacefeedapi.model.exception.CategoryNotFoundException;
-import com.vpr42.marketplacefeedapi.model.exception.InvalidFileException;
-import com.vpr42.marketplacefeedapi.model.exception.JobAlreadyExistsForUser;
-import com.vpr42.marketplacefeedapi.model.exception.JobNotFoundException;
-import com.vpr42.marketplacefeedapi.model.exception.JobsNotFoundException;
-import com.vpr42.marketplacefeedapi.model.exception.TagsNotFoundException;
-import com.vpr42.marketplacefeedapi.model.exception.UnableToUpdateCoverException;
+import com.vpr42.marketplacefeedapi.model.exception.*;
 import com.vpr42.marketplacefeedapi.repository.CategoryRepository;
 import com.vpr42.marketplacefeedapi.repository.JobRepository;
 import com.vpr42.marketplacefeedapi.repository.OrderRepository;
@@ -146,7 +140,14 @@ public class JobServiceImpl implements JobService {
         JobEntity entity = jobRepository.findWithDetailsById(dto.id())
                 .orElseThrow(() -> new JobNotFoundException(dto.id()));
 
-        if (jobRepository.findByMasterIdAndName(initiator.getId(), dto.name()).isPresent()) {
+        if (!entity.getUser().getId().equals(initiator.getId())) {
+            throw new JobEditForbiddenException(dto.id(), initiator.getId());
+        }
+
+        Optional<JobEntity> duplicate =
+                jobRepository.findByMasterIdAndName(initiator.getId(), dto.name());
+
+        if (duplicate.isPresent() && !duplicate.get().getId().equals(dto.id())) {
             throw new JobAlreadyExistsForUser(dto.name());
         }
 
