@@ -38,7 +38,7 @@ public class JobsMapper {
                 .name(dto.name())
                 .description(dto.description())
                 .price(dto.price())
-                .coverUrl(dto.coverUrl())
+                .coverUrl(null)
                 .category(category)
                 .user(user)
                 .tags(tags)
