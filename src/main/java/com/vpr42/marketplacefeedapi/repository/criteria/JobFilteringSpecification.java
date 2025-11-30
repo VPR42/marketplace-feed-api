@@ -66,7 +66,7 @@ public class JobFilteringSpecification {
             if (filters.getMasterId() != null) {
                 whereStatements.add(
                     cb.equal(
-                        master.get("id"),
+                        user.get("id"),
                         filters.getMasterId()
                     )
                 );
