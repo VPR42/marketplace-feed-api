@@ -146,7 +146,10 @@ public class JobServiceImpl implements JobService {
         JobEntity entity = jobRepository.findWithDetailsById(dto.id())
                 .orElseThrow(() -> new JobNotFoundException(dto.id()));
 
-        if (jobRepository.findByMasterIdAndName(initiator.getId(), dto.name()).isPresent()) {
+        Optional<JobEntity> duplicate =
+                jobRepository.findByMasterIdAndName(initiator.getId(), dto.name());
+
+        if (duplicate.isPresent() && !duplicate.get().getId().equals(dto.id())) {
             throw new JobAlreadyExistsForUser(dto.name());
         }
 
