@@ -294,7 +294,7 @@ public class JobController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(value = "/cover", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PutMapping(value = "/cover/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @Operation(summary = "Обновление обложки услуги", responses = {
             @ApiResponse(responseCode = "200", description = "Обложка обновлена"),
             @ApiResponse(responseCode = "400", description = "Не удалось обновить обложку",
@@ -354,11 +354,11 @@ public class JobController {
     @PreAuthorize("@jobSecurityService.hasAccess(#jobId, authentication)")
     public ResponseEntity<CoverUploadResponse> updateCover(
         @RequestPart("file") MultipartFile file,
-        @RequestPart("id") UUID jobId,
+        @PathVariable("id") String jobId,
         @AuthenticationPrincipal UserEntity currentUser
     ) {
         log.info("Processing update cover for job {} by user {}", jobId, currentUser.getId());
 
-        return ResponseEntity.ok(jobService.updateCover(jobId, file));
+        return ResponseEntity.ok(jobService.updateCover(UUID.fromString(jobId), file));
     }
 }
