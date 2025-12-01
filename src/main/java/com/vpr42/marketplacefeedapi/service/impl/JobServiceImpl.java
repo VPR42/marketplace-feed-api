@@ -196,17 +196,18 @@ public class JobServiceImpl implements JobService {
         String urlToFile = minioProperties.urls().publicUrl() + savedName;
         log.info("Url for new uploaded file: {}", urlToFile);
 
-        loadCover(jobId, file);
+        loadCover(jobId, file, savedName);
         job.setCoverUrl(urlToFile);
 
         return new CoverUploadResponse(savedName, urlToFile);
     }
 
-    private void loadCover(UUID jobId, MultipartFile file) {
+    private void loadCover(UUID jobId, MultipartFile file, String savedName) {
         try {
             minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket(minioProperties.bucket())
+                        .object(savedName)
                         .stream(file.getInputStream(), file.getSize(), -1)
                         .contentType(file.getContentType())
                         .build()
