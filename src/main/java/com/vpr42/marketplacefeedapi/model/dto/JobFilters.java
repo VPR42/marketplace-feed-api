@@ -44,12 +44,12 @@ public class JobFilters {
     private boolean fromFavourites;
 
     @Min(value = 0, message = "MinPrice must be positive or zero value")
-    @Max(value = 999999, message = "MaxPrice must be less than or equal to 999999")
+    @Max(value = 99999, message = "MaxPrice must be less than or equal to 999999")
     @Schema(description = "Минимальная цена / NULL", minimum = "0", nullable = true)
     private Integer minPrice;
 
     @Min(value = 1, message = "MaxPrice must be positive")
-    @Max(value = 999999, message = "MaxPrice must be less than or equal to 999999")
+    @Max(value = 99999, message = "MaxPrice must be less than or equal to 999999")
     @Schema(description = "Максимальная цена / NULL. Если максимальная цена <= минимальной, то параметр игнорируется",
             maximum = "999999", nullable = true)
     private Integer maxPrice;
