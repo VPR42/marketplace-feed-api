@@ -27,10 +27,9 @@ public class DevSecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(req -> req
-                    .requestMatchers("/swagger-ui/**", "/v3/api-docs*/**")
-                    .permitAll()
                     .anyRequest()
-                    .authenticated());
+                    .permitAll()
+            );
         return http.build();
     }
 }

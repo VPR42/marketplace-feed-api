@@ -43,18 +43,17 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(req ->
-                req
-                    .requestMatchers("/api/feed/docs/**",
-                            "/api/feed/swagger",
-                            "/api/feed/swagger-ui/**").permitAll()
-                    .requestMatchers("api/feed/**").authenticated()
+            .authorizeHttpRequests(req -> req
+                    .anyRequest()
+                    .permitAll()
             )
             .exceptionHandling(config -> {
-                config.authenticationEntryPoint((request, response, authException) -> {
-                   response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                });
-                config.accessDeniedHandler((request, response, accessDeniedException) -> {
+                config.authenticationEntryPoint(
+                        (request, response, authException) ->
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED)
+                );
+                config.accessDeniedHandler(
+                        (request, response, accessDeniedException) -> {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     ApiErrorResponse errorResponse = new ApiErrorResponse(HttpServletResponse.SC_FORBIDDEN,
                             ApiError.FORBIDDEN,
